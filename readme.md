@@ -1,6 +1,8 @@
+## 说明
+---
 基于Nodejs+Express+Vue的开发框架，配置好了webpack（编译前端文件），gulp（生成生产环境文件）。
 
-##文件目录结构
+## 文件目录结构
 ---
 1. app.js 服务器启动脚本
 2. app.json pm2的配置文件，可以使用个pm2 app.json启动脚本
@@ -21,11 +23,12 @@
 17. app\models\ 存放表模型的目录
 18. app\services\ 存放服务的目录
 
-##部署方法
-###开发环境
+## 部署方法
+---
+### 开发环境
 1. 运行webpack -w
 2. 运行npm start
-###生产环境
+### 生产环境
 1. 运行webpack
 2. 运行gulp
 3. 把dist目录拷贝到生产环境
