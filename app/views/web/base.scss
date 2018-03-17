@@ -1,0 +1,22 @@
+@import "./var";
+
+body{
+    margin: 0px;
+    font-family: "Microsoft Yahei,Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,SimSun,sans-serif";
+}
+
+*{
+    box-sizing: border-box;
+}
+/*去掉所有连接的下划线*/
+a,
+a:hover{
+    text-decoration: none;
+    color:inherit;
+}
+
+/*修改checkbox禁用状态的颜色*/
+.el-checkbox__input.is-disabled .el-checkbox__inner {
+    background-color: #fff !important;
+    cursor: default;
+}
