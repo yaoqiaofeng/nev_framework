@@ -1,7 +1,9 @@
 const path = require("path");
 const fs = require("fs");
 const config = require("config");
+const ssr = require("./processor/vue-ssr");
 
+//图片上传
 const multer = require("multer");
 const storage = multer.diskStorage({
 	destination: function(req, file, cb) {
@@ -31,9 +33,9 @@ function auth(req, res, next) {
 }
 
 module.exports = {
-    static(app){
+	static(app) {
 		app.use("/*.html", auth);
-    },
+	},
 
 	listening(app) {
 		app.use("/redirect", function(req, res, next) {
@@ -77,14 +79,19 @@ module.exports = {
 			} else if (typeof err == "object") {
 				message = JSON.stringify(err);
 			}
-            let msg="";
-			for (let i = 0; i < message.length; i++) {
-				if (msg == "") msg = message.charCodeAt(i).toString(16);
-				else msg += "," + message.charCodeAt(i).toString(16);
-			}
-			res.type("html");
-			res.cookie("500", msg);
-			res.sendFile(path.resolve(dconfig.path.public + "/500.html"));
+			let context = {
+                title: config.name + "错误",
+                data:{
+                    message
+                }
+            }; 
+			ssr["/500"].renderToString(context, (err, html) => {
+				if (err) {
+					res.status(500).end("Internal Server Error: " + err);
+					return;
+                }
+				res.end(html);
+			});
 		});
 	}
 };

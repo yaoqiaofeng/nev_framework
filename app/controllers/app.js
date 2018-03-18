@@ -11,8 +11,8 @@ module.exports = function(app) {
 		if (req.method == "OPTIONS") {
 			res.header("Access-Control-Allow-Origin", "*");
 			res.header(
-				"Access-Control-Allow-Headers",
-				"accept, access-control-allow-origin, x-access-token, content-type"
+                "Access-Control-Allow-Headers",
+                "accept, access-control-allow-origin, x-access-token, content-type"
 			);
 			res.header(
 				"Access-Control-Allow-Methods",
@@ -26,11 +26,12 @@ module.exports = function(app) {
 		}
     });
     
-	let routerlist = fs.readdirSync(__dirname, "utf-8");
-	let routers = [];
+    let routerlist = fs.readdirSync(__dirname, "utf-8");
+    let routers = [];
+    
 	//加载所有路由的前置处理，最优先
 	for (let i = 0; i < routerlist.length; i++) {
-		if (routerlist[i] != "app.js") {
+		if ((routerlist[i] != "app.js") && (routerlist[i] != "processor")){
 			let router = require("./" + routerlist[i]);
 			routers.push(router);
 			if (router.init) {

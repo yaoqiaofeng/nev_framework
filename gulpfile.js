@@ -36,4 +36,21 @@ gulp.task("uglifyApp", function (cb) {
     );
 });
 
-gulp.task('default', ['config','uglify','uglifyApp', 'public']);
+gulp.task("lib", function () {
+    return  gulp.src(["app/views/lib/**/*.*"],{base:'app/views'})
+        .pipe(gulp.dest("public"));
+    gulp.watch(['app/views/lib/**/*.*'], {cwd: 'app'}, reload);
+});
+
+gulp.task("images", function () {
+    return  gulp.src(["app/views/images/**/*.*"],{base:'app/views'})
+        .pipe(gulp.dest("public"));
+    gulp.watch(['app/views/images/**/*.*'], {cwd: 'app'}, reload);
+});
+
+if (process.env.NODE_ENV=== 'production'){
+    gulp.task('default', ['config','uglify','uglifyApp', 'public']);
+} else {
+    gulp.task('default', ['lib','images']);
+}
+
