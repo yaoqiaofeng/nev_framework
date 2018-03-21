@@ -54,7 +54,7 @@ module.exports = {
             //初始化业务
             this.loadServices('./app/services/');
             //加载路由
-            require("./app/controllers/app")(app);
+            require("./app/controllers/app")();
         }); 
     }  
 };
