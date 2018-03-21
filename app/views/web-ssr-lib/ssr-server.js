@@ -2,10 +2,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import api from './ssr-api';
-/*
+
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css';
-Vue.use(ElementUI);*/
+Vue.use(ElementUI);
 
 Vue.use(Vuex);
 function createStore() {

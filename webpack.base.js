@@ -18,20 +18,20 @@ let config = {
             //配置css的抽取器、加载器。
             //由于使用了 postCss插件，需要用!postcss-loader优先调用
             test: /\.css$/,
-            use: ["vue-style-loader","style-loader", "css-loader", "postcss-loader"]
+            use: ["vue-style-loader","css-loader", "postcss-loader"]
         },{
             test: /\.js$/,
             use: "babel-loader",
             exclude: /node_modules/
         },{
             test: /\.scss$/,
-            use: ["style-loader","css-loader", "postcss-loader", "sass-loader"]
+            use: ["vue-style-loader","css-loader", "postcss-loader", "sass-loader"]
         },{
             test: /\.sass$/,
-            use: ["style-loader","css-loader", "postcss-loader", "sass-loader"]
+            use: ["vue-style-loader","css-loader", "postcss-loader", "sass-loader"]
         },{
             test: /\.less$/,
-            use: ["style-loader","css-loader", "postcss-loader", "less-loader"]
+            use: ["vue-style-loader","css-loader", "postcss-loader", "less-loader"]
         },{
             //图片加载器，雷同file-loader，更适合图片，可以将较小的图片转成base64，减少http请求
             //如下配置，将小于8192byte的图片转成base64码

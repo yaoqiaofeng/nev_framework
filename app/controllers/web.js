@@ -72,7 +72,7 @@ module.exports = {
 			res.sendFile(path.resolve(config.path.public + "/404.html"));
 		});
 
-		app.use(function(err, req, res, next) {
+		app.use(async function(err, req, res, next) {
 			let message = "";
 			if (typeof err == "string") {
 				message = err;
@@ -85,13 +85,12 @@ module.exports = {
                     message
                 }
             }; 
-			ssr["/500"].renderToString(context, (err, html) => {
-				if (err) {
-					res.status(500).end("Internal Server Error: " + err);
-					return;
-                }
+            try{
+			    let html = await ssr("/500",context);
 				res.end(html);
-			});
+			} catch(err){
+                res.status(500).end("Internal Server Error: " + err);
+            }
 		});
 	}
 };

@@ -48,4 +48,15 @@ function getRenderer(dir, template){
 
 getRenderer('app/views/web-ssr/');
 
-module.exports = rendererMap;   
+function render(url, context) {
+    return new Promise((resolve, reject)=>{
+        rendererMap[url].renderToString(context, (err, html) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(html);
+        });
+    })
+}
+
+module.exports = render;   
