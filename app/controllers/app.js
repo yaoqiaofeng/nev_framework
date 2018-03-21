@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const config = require("config");
-const express = require("express");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");

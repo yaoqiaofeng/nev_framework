@@ -1,4 +1,5 @@
 const batch = require("./batch");
+const load = require("./load");
 batch(function(){
     //
     load.init();
