@@ -6,7 +6,7 @@
 2. 数据库基于mysql，如果不是用mysql，对着核心模块下的db自己写一个数据库接口。   
 3. 数据库缓存基于redis，如果不用redis，对着核心模块下的cache自己写一个缓存接口。  
 4. 如果数据库修改源不是独占的，那么用表模型可能就不适用，那就直接在service里写sql。 
-5.如果不用Express，只需要替换和app\controllers\app.js即可。   
+5. 如果不用Express，只需要替换和app\controllers\app.js即可。   
    
 ## 文件目录结构
 ---
