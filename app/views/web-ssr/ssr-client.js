@@ -1,21 +1,7 @@
-import {data, api} from "./ssr-api";
-
 Vue.use(Vuex);
-function createStore() {
+function createStore(store) {
 	new Vuex.Store({
-		state: data,
-		actions: {
-            getData: function ({ commit }, name) {
-                return api(name).then(data => {
-                    commit('setData', { name, data });
-                });
-            }
-        },
-		mutations: {
-            setData: (state, { name, data }) => {
-                Vue.set(state, name, data);
-            }
-        },
+		state: store
 	});
 }
 
@@ -29,12 +15,12 @@ function createRouter(routes) {
 
 //page：vue页面
 //routes：路由
-function createApp({ page,  routes }) {
+function createApp({ page,  routes, store }) {
 
 	let vue = {};
 
 	//建立vuex
-	vue.store = createStore();
+	vue.store = createStore(store, api);
 
 	//建立路由
 	if (routes) {
@@ -62,7 +48,7 @@ if (window.__INITIAL_STATE__) {
 	store.replaceState(window.__INITIAL_STATE__);
 }
 
-export default ({ page, el }) => {
+export default ({ page, el, store }) => {
 
 	const { app, store, router } = createApp({
 		page,

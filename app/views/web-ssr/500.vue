@@ -12,6 +12,9 @@
 import header from './components/header.vue';
 import footer from './components/footer.vue';
 export default {
+    asynData: function(){
+
+    },
 	data: function() {
 		return {
             message: ""

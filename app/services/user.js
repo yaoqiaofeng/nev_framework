@@ -19,12 +19,12 @@ class user extends serviceObject{
 
     static doAuth(data, op){
         if ((op=='get') || (op=='list')){
-            switch (data.identity) {
-                case 'admin':
+       //     switch (data.identity) {
+            //    case 'admin':
                     return true;
-                default: 
-                    throw '权限不足';
-            }
+         //       default: 
+            //        throw '权限不足';
+        //    }
         } else if (data.identity=='admin') {
             if (op=='add') data.password = crypto.createHash('md5').update('8888').digest('hex'); 
             return true

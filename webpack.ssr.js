@@ -23,7 +23,7 @@ function doGetEntry(dir, template) {
 		if (stat.isDirectory()) {
 			doGetEntry(file + "/", template);
 		} else if (ext == ".js") {
-            if ((filename=='ssr-api.js') || (filename=='ssr-client') || (filename=='ssr-server.js') || (filename=='ssr-ui.js')){
+            if ((filename=='ssr-client') || (filename=='ssr-server.js')){
                 continue;
             }
             //服务端

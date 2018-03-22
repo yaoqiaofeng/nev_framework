@@ -1,16 +1,9 @@
-// store.js
-import Vue from "vue";
-
-//注册渲染组件
-import ui from "./ssr-ui";
-ui(Vue);
-
 import Vuex from "vuex";
 import {data, api} from "./ssr-api";
-Vue.use(Vuex);
-function createStore() {
+function createStore(Vue, store, api) {
+    Vue.use(Vuex);
 	new Vuex.Store({
-		state: data,
+		state: store,
 		actions: {
             getData: function ({ commit }, name) {
                 return api(name).then(data => {
@@ -28,8 +21,8 @@ function createStore() {
 
 import VueRouter from "vue-router";
 import { sync } from "vuex-router-sync";
-Vue.use(VueRouter);
-function createRouter(routes) {
+function createRouter(Vue, routes) {
+    Vue.use(VueRouter);
 	return new VueRouter({
 		mode: "history",
 		routes: routes
@@ -39,22 +32,22 @@ function createRouter(routes) {
 //page：vue页面
 //data：需要用来渲染页面的数据
 //routes：路由
-function createApp({page, data, routes}) {
+function createApp({Vue, page, data, routes, store, api}) {
 
 	//合并从上下文参数传递过来的数据
-	let dataFun = page.data;
+	let old = page.data;
 	page.data = function() {
-		return Object.assign(dataFun(), data);
+		return Object.assign(old(), data);
 	};
 
     let vue = {};
     
     //建立vuex
-    vue.store = createStore();
+    vue.store = createStore(Vue, store, api);
 
     //建立路由
     if (routes) {
-        vue.router = createRouter(routes);
+        vue.router = createRouter(Vue, routes);
 	    // 同步路由状态(route state)到 store
         sync(vue.store, vue.router);
     }
@@ -80,15 +73,18 @@ routes 示例：
       { path: '/item/:id', component: () => import('./components/Item.vue') }
     ]
 */
-export default ({context, page}) => {
+export default ({Vue, context, page, routes, store, api}) => {
 	// 因为有可能会是异步路由钩子函数或组件，所以我们将返回一个 Promise，
 	// 以便服务器能够等待所有的内容在渲染前，
 	// 就已经准备就绪。
 	return new Promise((resolve, reject) => {
 		const { app, store, router } = createApp({
+            Vue,
             page,
             data: context.data, 
-            routers: page.routes
+            routes,
+            store, 
+            api
         });
         if (router){
     		// 设置服务器端 router 的位置
