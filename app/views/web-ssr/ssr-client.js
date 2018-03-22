@@ -1,21 +1,19 @@
-import api from "./ssr-api";
+import {data, api} from "./ssr-api";
 
 Vue.use(Vuex);
 function createStore() {
 	new Vuex.Store({
-		state: {
-            items: {}
-        },
+		state: data,
 		actions: {
             getData: function ({ commit }, name) {
                 return api(name).then(data => {
-                    commit('setItems', { name, data });
+                    commit('setData', { name, data });
                 });
             }
         },
 		mutations: {
             setData: (state, { name, data }) => {
-                Vue.set(state.items, name, data);
+                Vue.set(state, name, data);
             }
         },
 	});
@@ -71,7 +69,6 @@ export default ({ page, el }) => {
 		routers: page.routes
     });
 
-    console.log(app);
     if (!router) {
         return app.$mount(el);
     }

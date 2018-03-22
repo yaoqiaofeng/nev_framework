@@ -15,6 +15,7 @@ module.exports = {
     },
 
     name: 'nev',
+    
     //服务运行配置模块
     server:{
         //服务器运行端口号
@@ -25,11 +26,11 @@ module.exports = {
        public : "public"
     },
 
-    "jwt": {
-        "secret": "8047832D44F34C92972C3DB33998586B"
+    jwt: {
+        secret: "8047832D44F34C92972C3DB33998586B"
     },
 
-    "session": {
-        "secret": "8047832D44F34C92972C3DB33998586B"
+    session: {
+        secret: "8047832D44F34C92972C3DB33998586B"
     }
 }

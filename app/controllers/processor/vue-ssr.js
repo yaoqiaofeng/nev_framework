@@ -31,6 +31,9 @@ function getRenderer(dir, template){
 		if (stat.isDirectory()) {          
 			getRenderer(file + "/", template);
 		} else if (ext == ".js") {
+            if ((filename=='ssr-api.js') || (filename=='ssr-client') || (filename=='ssr-server.js') || (filename=='ssr-ui.js')){
+                continue;
+            }
             if (filename.match(/-server\.js$/)){
                 continue;
             }

@@ -14,10 +14,7 @@ module.exports = function(dir, name, maxCount=5){
     }
     let storage = multer.diskStorage({
         destination: function(req, file, cb) {
-            let dir = path.resolve(
-                config.path.public + dir,
-                req.result.user.username
-            );
+            let dir = dir(req);
             fs.mkdir(dir, function(err) {
                 cb(null, dir);
             });

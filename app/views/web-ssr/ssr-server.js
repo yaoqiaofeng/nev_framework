@@ -1,28 +1,26 @@
 // store.js
 import Vue from "vue";
+
+//注册渲染组件
+import ui from "./ssr-ui";
+ui(Vue);
+
 import Vuex from "vuex";
-import api from './ssr-api';
-
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css';
-Vue.use(ElementUI);
-
+import {data, api} from "./ssr-api";
 Vue.use(Vuex);
 function createStore() {
 	new Vuex.Store({
-		state: {
-            items: {}
-        },
+		state: data,
 		actions: {
             getData: function ({ commit }, name) {
                 return api(name).then(data => {
-                    commit('setItems', { name, data });
+                    commit('setData', { name, data });
                 });
             }
         },
 		mutations: {
             setData: (state, { name, data }) => {
-                Vue.set(state.items, name, data);
+                Vue.set(state, name, data);
             }
         },
 	});
@@ -31,7 +29,6 @@ function createStore() {
 import VueRouter from "vue-router";
 import { sync } from "vuex-router-sync";
 Vue.use(VueRouter);
-
 function createRouter(routes) {
 	return new VueRouter({
 		mode: "history",

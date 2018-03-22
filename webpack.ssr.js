@@ -23,6 +23,9 @@ function doGetEntry(dir, template) {
 		if (stat.isDirectory()) {
 			doGetEntry(file + "/", template);
 		} else if (ext == ".js") {
+            if ((filename=='ssr-api.js') || (filename=='ssr-client') || (filename=='ssr-server.js') || (filename=='ssr-ui.js')){
+                continue;
+            }
             //服务端
             if (fileList[i].match(/-server\.js$/)){
                 entry = dir + path.basename(fileList[i], ext);
@@ -48,7 +51,7 @@ function doGetEntry(dir, template) {
                 }));
             }
             //客户端
-            if (!(fileList[i].match(/-server\.js$/))){
+            if ((fileList[i].match(/-client\.js$/))){
                 entry = dir + path.basename(fileList[i], ext);
                 entry = entry.replace("./app/views/web-ssr/", "");
                 clients.push(webpackMerge(webpackBase,  {

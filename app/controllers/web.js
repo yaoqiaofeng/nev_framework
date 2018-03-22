@@ -4,22 +4,9 @@ const config = require("config");
 const ssr = require("./processor/vue-ssr");
 
 //图片上传
-const multer = require("multer");
-const storage = multer.diskStorage({
-	destination: function(req, file, cb) {
-		let dir = path.join(
-			__dirname,
-			config.path.public + "/images/",
-			req.result.user.username
-		);
-		fs.mkdir(dir, function(err) {
-			cb(null, dir);
-		});
-	}
-});
-const upload = multer({ storage: storage }).fields([
-	{ name: "images", maxCount: 5 }
-]);
+const upload = require("./processor/upload")(function(req){
+    return path.resolve(config.path.public + "/images/", req.result.user.username);
+}, "images", 5);
 
 function auth(req, res, next) {
 	if (req.baseUrl == "/user/login.html") {
