@@ -21,7 +21,7 @@ module.exports = function() {
 	// 记录请求日志
 	app.use(logger("tiny"));
 	//最优先的处理请求
-	app.use(function(req, res, next) {
+    app.use(function (req, res, next) {
 		//响应options请求
 		if (req.method == "OPTIONS") {
 			res.header("Access-Control-Allow-Origin", "*");
@@ -40,7 +40,7 @@ module.exports = function() {
 			next();
 		}
 	});
-
+    
 	let routerlist = fs.readdirSync(__dirname, "utf-8");
 	let routers = [];
 
@@ -69,7 +69,8 @@ module.exports = function() {
 	for (let i = 0; i < routers.length; i++) {
 		routers[i].listening(app);
 	}
-
+    //设置端口号
+    process.env.PORT = config.server.port;
 	//
 	app.listen(config.server.port);
 };

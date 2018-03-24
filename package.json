@@ -1,14 +1,13 @@
 {
   "name": "nev",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev-webpack": "cross-env NODE_ENV=development  webpack --config webpack.static.js",
     "dev-gulp": "cross-env NODE_ENV=development  gulp ",
-    "dev-node": "cross-env NODE_ENV=development  nodemon app",
     "dev-ssr-webpack": "cross-env NODE_ENV=development  node webpack.ssr.js",
-    "dev": "npm run dev-webpack && npm run dev-node ",
-    "dev-ssr": "npm run dev-ssr-webpack | npm run dev-gulp | npm run dev-node ",
+    "ssr": "npm run dev-gulp | npm run dev-ssr-webpack ",
+    "static": "cross-env NODE_ENV=development  webpack --config webpack.static.js",
+    "start": "cross-env NODE_ENV=development  nodemon app",
     "build": "cross-env NODE_ENV=production  webpack --config webpack.static.js && cross-env NODE_ENV=production  node webpack.ssr.js && cross-env NODE_ENV=production  gulp"
   },
   "dependencies": {

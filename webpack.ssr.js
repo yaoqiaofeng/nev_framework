@@ -23,7 +23,7 @@ function doGetEntry(dir, template) {
 		if (stat.isDirectory()) {
 			doGetEntry(file + "/", template);
 		} else if (ext == ".js") {
-            if ((filename=='ssr-client') || (filename=='ssr-server.js')){
+            if ((fileList[i] == 'ssr-client.js') || (fileList[i]=='ssr-server.js')){
                 continue;
             }
             //服务端
@@ -54,6 +54,7 @@ function doGetEntry(dir, template) {
             if ((fileList[i].match(/-client\.js$/))){
                 entry = dir + path.basename(fileList[i], ext);
                 entry = entry.replace("./app/views/web-ssr/", "");
+                entry = entry.replace(/-client$/, "");
                 clients.push(webpackMerge(webpackBase,  {
                     target: 'node',
                     entry: file,
@@ -76,8 +77,8 @@ function doGetEntry(dir, template) {
 }
 doGetEntry("./app/views/web-ssr/");
 for(let server of servers){
-    webpack(server, ()=>{});
+    webpack(server, (msg)=>{ console.log(msg) });
 }
 for(let client of clients){
-    webpack(client, ()=>{});
+    webpack(client, (msg) => { console.log(msg) });
 }

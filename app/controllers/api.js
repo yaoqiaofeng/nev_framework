@@ -263,16 +263,16 @@ module.exports = {
 			result
 		);
 
-		app.get("/api/:server/list", auth,
-            async function(req, res, next) {
-				console.log(req.params.server + ".list");
+        app.get("/api/:server/list", auth,
+            async function (req, res, next) {
+                console.log(req.params.server + ".list");
 				let server = Service(req.params.server);
-				if (server) {
+                if (server) {
 					try{
                         req.result.data = await server.list(Object.assign(req.query, {
 							user_id: req.result.user.id,
 							identity: req.result.user.type
-						}));
+                        }));
                     } catch(err){
                         req.result.error = err;
                     }

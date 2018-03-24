@@ -31,29 +31,35 @@ function getRenderer(dir, template){
 		if (stat.isDirectory()) {          
 			getRenderer(file + "/", template);
 		} else if (ext == ".js") {
-            if ((filename=='ssr-client') || (filename=='ssr-server.js')){
+            if ((filename=='ssr-client.js') || (filename=='ssr-server.js')){
                 continue;
             }
-            if (filename.match(/-server\.js$/)){
-                continue;
+            if (filename.match(/-server\.js$/)) {
+                let basepath = dir + path.basename(filename, ext);
+                basepath = basepath.replace('app/views/web-ssr', "");
+                basepath = basepath.replace(/-server$/, "");
+                let url = basepath;
+                let clientManifest = require(path.resolve(config.path.public+basepath+'/client-manifest.json'));
+                let bundle = require(path.resolve(config.path.public+basepath+'/server-bundle.json'));
+                rendererMap[url] = createRenderer(bundle, {
+                    template, clientManifest 
+                 });
             }
-            let basepath = dir + path.basename(filename, ext);
-            basepath = basepath.replace('app/views/web-ssr', "");
-            let url = basepath;
-            let clientManifest = require(path.resolve(config.path.public+basepath+'/client-manifest.json'));
-            let bundle = require(path.resolve(config.path.public+basepath+'/server-bundle.json'));
-            rendererMap[url] = createRenderer(bundle, {
-                template, clientManifest 
-            });
         }
     }
 }
 
 getRenderer('app/views/web-ssr/');
 
-function render(url, context) {
+function render({ name, url, data, req }) {
+    let context = {
+        url,
+        title: config.name,
+        data: data,
+        cookies: req.cookies
+    };
     return new Promise((resolve, reject)=>{
-        rendererMap[url].renderToString(context, (err, html) => {
+        rendererMap[name].renderToString(context, (err, html) => {
             if (err) {
                 return reject(err);
             }

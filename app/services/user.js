@@ -17,14 +17,14 @@ class user extends serviceObject{
         return "user";
     } 
 
-    static doAuth(data, op){
+    static doAuth(data, op) {
         if ((op=='get') || (op=='list')){
-       //     switch (data.identity) {
-            //    case 'admin':
+            switch (data.identity) {
+                case 'admin':
                     return true;
-         //       default: 
-            //        throw '权限不足';
-        //    }
+                default: 
+                    throw '权限不足';
+            }
         } else if (data.identity=='admin') {
             if (op=='add') data.password = crypto.createHash('md5').update('8888').digest('hex'); 
             return true
@@ -38,7 +38,7 @@ class user extends serviceObject{
     //获取列表数据的处理过程
     //data: 传递外部调用的数据
     //dataset: 获取的列表数据
-    static async doFilter(data, dataset){
+    static async doFilter(data, dataset) {
         switch (data.identity) {
             case 'admin':
                 return dataset;
@@ -118,7 +118,6 @@ class user extends serviceObject{
         let User = model("user");
         let user = {};
         let all = await User.select();
-        console.log(all, data);
         for(let i=0; i<all.length; i++){
             if ((all[i].username==data.username) ||
                 (all[i].tel==data.username) ||
@@ -126,8 +125,8 @@ class user extends serviceObject{
                 user = all[i];
                 break;
             }
-        }               
-        if (user.id){
+        }
+        if (user.id != undefined) {
             let password = crypto.createHash('md5').update(data.password).digest('hex').toUpperCase();
             if (user.password.toUpperCase() == password){
                 return {

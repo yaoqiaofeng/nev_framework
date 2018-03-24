@@ -93,7 +93,7 @@ vup.install = function(Vue, options) {
                 this.begin("加载中");
             }
             return new Promise((resolve, reject) => {
-                this.vue.$http.get(url, options).then(
+                thisaxios.get(url, options).then(
                     response => {
                         if (options.load) {
                             this.end();
@@ -126,7 +126,7 @@ vup.install = function(Vue, options) {
                 this.begin("提交中");
             }
             return new Promise((resolve, reject) => {
-                this.vue.$http.post(url, body, options).then(
+                axios.post(url, body, options).then(
                     response => {
                         if (options.load) {
                             this.end();
@@ -158,7 +158,7 @@ vup.install = function(Vue, options) {
                 this.begin("提交中");
             }
             return new Promise((resolve, reject) => {
-                this.vue.$http.put(url, body, options).then(
+                axios.put(url, body, options).then(
                     response => {
                         if (options.load) {
                             this.end();
@@ -190,7 +190,7 @@ vup.install = function(Vue, options) {
                 this.begin("删除中");
             }
             return new Promise((resolve, reject) => {
-                this.vue.$http.put(url, body, options).then(
+                axios.delete(url, options).then(
                     response => {
                         if (options.load) {
                             this.end();

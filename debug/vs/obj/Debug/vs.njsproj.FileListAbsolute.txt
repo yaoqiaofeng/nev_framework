@@ -1,0 +1,3 @@
+D:\Project\Nodejs框架\debug\vs\obj\Debug\vs.njsproj.CoreCompileInputs.cache
+D:\Project\Nodejs框架\debug\vs\bin\Microsoft.NodejsTools.WebRole.dll
+D:\Project\Nodejs框架\debug\vs\obj\Debug\vs.njsprojResolveAssemblyReference.cache

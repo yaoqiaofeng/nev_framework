@@ -37,7 +37,7 @@ function doGetEntry(dir, template) {
 			entrys[entry] = file;
 			let plugin = {
 				inject: true,
-				filename: name + ".html",
+                filename: entry + ".html",
 				chunks: [entry],
 				title: conf.name,
                 template: template,

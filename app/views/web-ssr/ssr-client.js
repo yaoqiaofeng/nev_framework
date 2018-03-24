@@ -1,64 +1,114 @@
-Vue.use(Vuex);
-function createStore(store) {
-	new Vuex.Store({
-		state: store
-	});
+
+function api(options) {
+    return new Promise((resolve, reject) => {
+        let local = options.url[0] == '/';
+        if (!options.method) {
+            options.method = 'get'
+        }
+        axios(options).then((response) => {
+            let data = response.data;
+            if (local) {
+                if (data.result && (data.result = 'success')) {
+                    resolve(data.data);
+                } else {
+                    reject(data.message);
+                }
+            } else {
+                resolve(data)
+            }
+        }).catch(reject);
+    })
 }
 
-Vue.use(VueRouter);
-function createRouter(routes) {
-	return new VueRouter({
-		mode: "history",
-		routes: routes
-	});
+function createStore(page, routes) {
+    Vue.use(Vuex);
+    return new Vuex.Store({
+        state: page.serverData,
+        actions: {
+            api: function ({ commit }, options) {
+                return api(options).then(data => {
+                    commit('set', { name: options.name, data });
+                });
+            }
+        },
+        mutations: {
+            set: (state, { name, data }) => {
+                Vue.set(state, name, data);
+            }
+        },
+    });
+}
+
+function createRouter(page, routes) {
+    Vue.use(VueRouter);
+    return new VueRouter({
+//        mode: "history",
+        routes: routes
+    });
 }
 
 //page：vue页面
+//data：需要用来渲染页面的数据
 //routes：路由
-function createApp({ page,  routes, store }) {
+function createApp({ page, routes }) {
+    
+    let vue = {};
 
-	let vue = {};
+    //建立vuex
+    vue.store = createStore(page);
 
-	//建立vuex
-	vue.store = createStore(store, api);
-
-	//建立路由
-	if (routes) {
-		vue.router = createRouter(routes);
-		// 同步路由状态(route state)到 store
-		sync(vue.store, vue.router);
-	}
-
-	//
-	vue.render = h => h(page);
-	// 创建应用程序实例
-	const app = new Vue(vue);
-
-	// 暴露 app, router 和 store。
-	return {
-		app,
-		router: vue.router,
-		store: vue.store
-	};
-}
-
-//import NProgress from 'nprogress'
-
-if (window.__INITIAL_STATE__) {
-	store.replaceState(window.__INITIAL_STATE__);
-}
-
-export default ({ page, el, store }) => {
-
-	const { app, store, router } = createApp({
-		page,
-		routers: page.routes
-    });
-
-    if (!router) {
-        return app.$mount(el);
+    //建立路由
+    if (routes) {
+        vue.router = createRouter(page, routes);
+        // 同步路由状态(route state)到 store
+        sync(vue.store, vue.router);
     }
-	//NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
+
+    //
+    vue.render = h => h(page);
+    // 创建应用程序实例
+    const app = new Vue(vue);
+
+    // 暴露 app, router 和 store。
+    return {
+        app,
+        router: vue.router,
+        store: vue.store
+    };
+}
+
+
+export default ({ page, el, routes }) => {
+
+    const { app, store, router } = createApp({ page, routes });
+
+    //不启用路由模式
+    if (!router) {
+        page.asyncData({ store }).then(() => {
+            app.$mount(el);
+        });
+        return 
+    }
+
+    //当路由组件重用（同一路由，但是 params 或 query 已更改，
+    //例如，从 user / 1 到 user / 2）时，也应该调用 asyncData 函数。
+    //我们也可以通过纯客户端(client - only)的全局 mixin 来处理这个问题：
+    Vue.mixin({
+        beforeRouteUpdate(to, from, next) {
+            const { asyncData } = this.$options
+            if (asyncData) {
+                asyncData({
+                    store: this.$store,
+                    route: to
+                }).then(next).catch(next)
+            } else {
+                next()
+            }
+        }
+    })
+
+    //加载进度条
+    NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
 
 	router.onReady(() => {
 		// 添加路由钩子函数，用于处理 asyncData.
@@ -76,21 +126,22 @@ export default ({ page, el, store }) => {
 			});
 			if (!activated.length) {
 				return next();
-			}
-			// 这里如果有加载指示器(loading indicator)，就触发
-			Promise.all(
-				activated.map(c => {
-					if (c.asyncData) {
-						return c.asyncData({ store, route: to });
-					}
-				})
-			)
-				.then(() => {
-					// 停止加载指示器(loading indicator)
-					// NProgress.done()
-					next();
-				})
-				.catch(next);
+            }
+            // 组件数据通过执行asyncData方法获取
+            const asyncDataHooks = activated.map(c => c.asyncData).filter(_ => _)
+            if (!asyncDataHooks.length) {
+                return next()
+            }
+            // 这里如果有加载指示器(loading indicator)，就触发
+            NProgress.start();
+            // 要注意asyncData方法要返回promise，asyncData调用的vuex action也必须返回promise
+            Promise.all(asyncDataHooks.map(hook => hook({ store, route: to })))
+                .then(() => {
+                    // 停止加载指示器(loading indicator)
+                    NProgress.done()
+                    next()
+                })
+                .catch(next);
 		});
         app.$mount(el);
 	});

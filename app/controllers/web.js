@@ -33,7 +33,7 @@ module.exports = {
 			}
 		});
 
-		app.post("/images/upload", auth, function(req, res, next) {
+        app.post("/images/upload", auth, function (req, res, next) {
 			upload(req, res, function(err) {
 				if (err) {
 					return res.json({ errno: err });
@@ -48,7 +48,21 @@ module.exports = {
 					data: data
 				});
 			});
-		});
+        });
+
+        app.get("/ssr/*", async function (req, res, next) {
+            try {
+                let url = req.baseUrl;
+                url = url.replace('/ssr', '');
+                let html = await ssr({
+                    name: "/app", data: { user: req.result.user}, req, url
+                });
+                res.type('html');
+                res.end(html);
+            } catch (err) {
+                res.status(500).end("Internal Server Error: " + err);
+            }
+        });
 
 		app.get("/error", function(req, res, next) {
 			next("错误页面测试");
@@ -57,7 +71,7 @@ module.exports = {
 		app.get("*", function(req, res, next) {
 			res.type("html");
 			res.sendFile(path.resolve(config.path.public + "/404.html"));
-		});
+        });
 
 		app.use(async function(err, req, res, next) {
 			let message = "";
@@ -66,14 +80,11 @@ module.exports = {
 			} else if (typeof err == "object") {
 				message = JSON.stringify(err);
 			}
-			let context = {
-                title: config.name + "错误",
-                data:{
-                    message
-                }
-            }; 
             try{
-			    let html = await ssr("/500",context);
+                let html = await ssr({
+                    name: "/500", data: { message }, req
+                });
+                res.type('html');
 				res.end(html);
 			} catch(err){
                 res.status(500).end("Internal Server Error: " + err);
