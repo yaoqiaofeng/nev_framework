@@ -34,13 +34,12 @@ function getRenderer(dir, template){
             if ((filename=='ssr-client.js') || (filename=='ssr-server.js')){
                 continue;
             }
-            if (filename.match(/-server\.js$/)) {
-                let basepath = dir + path.basename(filename, ext);
-                basepath = basepath.replace('app/views/web-ssr', "");
-                basepath = basepath.replace(/-server$/, "");
-                let url = basepath;
+            if (filename == 'server.js') {
+                let basepath = dir.replace('app/views/web-ssr', "");
+                let url = dir.replace('app/views/web-ssr/', "");
+                url = url.substr(0, url.length-1);
                 let clientManifest = require(path.resolve(config.path.public+basepath+'/client-manifest.json'));
-                let bundle = require(path.resolve(config.path.public+basepath+'/server-bundle.json'));
+                let bundle = require(path.resolve(config.path.public +basepath+'/server-bundle.json'));
                 rendererMap[url] = createRenderer(bundle, {
                     template, clientManifest 
                  });
@@ -51,9 +50,9 @@ function getRenderer(dir, template){
 
 getRenderer('app/views/web-ssr/');
 
-function render({ name, url, data, req }) {
+function render({ name, data, req }) {
     let context = {
-        url,
+        url: req.path,
         title: config.name,
         data: data,
         cookies: req.cookies

@@ -1,5 +1,5 @@
 <template lang="html">
-    <el-main id="home" class="home" v-title="首页">
+    <el-main id="home" class="home">
         这里是首页
         <el-button type="primary" @click="onGotoLogin">马上去登陆</el-button>
      </el-main>
@@ -7,14 +7,14 @@
 
 <script>
 export default {
+    title: "首页",
     data() {
         return {
         };
     },
     methods: {
         onGotoLogin() {
-            console.log(this.$router);
-            this.$router.push({ path: '/user/login' })
+            this.$router.push({ path: '/app/user/login' })
         }
     }
     

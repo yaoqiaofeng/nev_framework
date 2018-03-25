@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const conf = require("./config");
 const path = require("path");
 
@@ -18,20 +19,32 @@ let config = {
             //配置css的抽取器、加载器。
             //由于使用了 postCss插件，需要用!postcss-loader优先调用
             test: /\.css$/,
-            use: ["vue-style-loader","css-loader", "postcss-loader"]
+            use: ExtractTextPlugin.extract({
+                fallback: "style-loader",
+                use: ["css-loader", "postcss-loader"]
+            })
         },{
             test: /\.js$/,
             use: "babel-loader",
             exclude: /node_modules/
         },{
             test: /\.scss$/,
-            use: ["vue-style-loader","css-loader", "postcss-loader", "sass-loader"]
+            use: ExtractTextPlugin.extract({
+                fallback: "style-loader",
+                use: ["css-loader", "postcss-loader", "sass-loader"]
+            })
         },{
             test: /\.sass$/,
-            use: ["vue-style-loader","css-loader", "postcss-loader", "sass-loader"]
+            use: ExtractTextPlugin.extract({
+                fallback: "style-loader",
+                use: ["css-loader", "postcss-loader", "sass-loader"]
+            })
         },{
             test: /\.less$/,
-            use: ["vue-style-loader","css-loader", "postcss-loader", "less-loader"]
+            use: ExtractTextPlugin.extract({
+                fallback: "style-loader",
+                use: ["css-loader", "postcss-loader", "less-loader"]
+            })
         },{
             //图片加载器，雷同file-loader，更适合图片，可以将较小的图片转成base64，减少http请求
             //如下配置，将小于8192byte的图片转成base64码
@@ -55,17 +68,49 @@ let config = {
                     }
                 }
             ]
-        },{
-            test: /\.vue$/,
-            use:  "vue-loader"
-        }]
+		}, {
+		    test: /\.vue$/,
+		    loader: "vue-loader",
+		    options: {
+                loaders: {
+                    css: ExtractTextPlugin.extract({
+                        use: ["css-loader", "postcss-loader"],
+                        fallback: "vue-style-loader"
+                    }),
+                    less: ExtractTextPlugin.extract({
+                        use: [
+                            "css-loader",
+                            "postcss-loader",
+                            "less-loader"
+                        ],
+                        fallback: "vue-style-loader"
+                    }),
+                    scss: ExtractTextPlugin.extract({
+                        use: [
+                            "css-loader",
+                            "postcss-loader",
+                            "sass-loader"
+                        ],
+                        fallback: "vue-style-loader"
+                    }),
+                    sass: ExtractTextPlugin.extract({
+                        use: [
+                            "css-loader",
+                            "postcss-loader",
+                            "sass-loader"
+                        ],
+                        fallback: "vue-style-loader"
+                    })
+                }
+		    }
+		}]
     },
     watch: true,
     devtool: '#eval-source-map'
 };
 
 if (process.env.NODE_ENV=== 'production'){
-    watch: false,
+    config.watch= false,
     config.devtool = "#source-map";   
     config.plugins.push(
 		//webpack自带的js压缩插件

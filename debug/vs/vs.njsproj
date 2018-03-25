@@ -21,6 +21,7 @@
     <NodejsPort>3000</NodejsPort>
     <DebuggerPort>
     </DebuggerPort>
+    <LaunchUrl>http://localhost:3000/app/user/login</LaunchUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -29,15 +30,32 @@
     <Content Include=".eslintrc" />
     <Content Include=".gitignore" />
     <Compile Include="app.js" />
-    <Compile Include="app\views\web-ssr\user\login.js" />
+    <Compile Include="app\node_modules\cache.js" />
+    <Compile Include="app\node_modules\config.js" />
+    <Compile Include="app\node_modules\db.js" />
+    <Compile Include="app\node_modules\init.js" />
+    <Compile Include="app\node_modules\model.js" />
+    <Compile Include="app\node_modules\modelObject.js" />
+    <Compile Include="app\node_modules\service.js" />
+    <Compile Include="app\node_modules\serviceObject.js" />
+    <Compile Include="app\views\lib\axios\axios.min.js" />
+    <Compile Include="app\views\lib\nprogress\nprogress.js" />
+    <Compile Include="app\views\web-ssr\500\client.js" />
+    <Compile Include="app\views\web-ssr\500\server.js" />
+    <Compile Include="app\views\web-ssr\app\client.js" />
+    <Compile Include="app\views\web-ssr\app\server.js" />
     <Compile Include="batch.js" />
     <Compile Include="config.js" />
     <Compile Include="gulpfile.js" />
-    <Content Include="app\views\web-ssr\home.vue" />
-    <Content Include="app\views\web-ssr\user\login.vue" />
+    <Content Include="app\views\lib\nprogress\nprogress.css" />
+    <Content Include="app\views\web-ssr\500\index.vue" />
+    <Content Include="app\views\web-ssr\app\404.vue" />
+    <Content Include="app\views\web-ssr\app\500.vue" />
+    <Content Include="app\views\web-ssr\app\index.vue" />
+    <Content Include="app\views\web-ssr\app\home.vue" />
+    <Content Include="app\views\web-ssr\app\user\login.vue" />
     <Content Include="LICENSE.txt" />
     <Compile Include="load.js" />
-    <Content Include="package-lock.json" />
     <Content Include="package.json" />
     <Compile Include="pm.js" />
     <Compile Include="postcss.config.js" />
@@ -45,7 +63,6 @@
     <Compile Include="webpack.base.js" />
     <Compile Include="webpack.ssr.js" />
     <Compile Include="webpack.static.js" />
-    <Content Include="yarn.lock" />
     <Compile Include="app\controllers\api.js" />
     <Compile Include="app\controllers\app.js" />
     <Compile Include="app\controllers\web.js" />
@@ -63,12 +80,6 @@
     <Content Include="app\views\web\index.vue" />
     <Content Include="app\views\web\template.html" />
     <Content Include="app\views\web\var.scss" />
-    <Compile Include="app\views\web-ssr\500-client.js" />
-    <Compile Include="app\views\web-ssr\500-server.js" />
-    <Content Include="app\views\web-ssr\500.vue" />
-    <Compile Include="app\views\web-ssr\app-client.js" />
-    <Compile Include="app\views\web-ssr\app-server.js" />
-    <Content Include="app\views\web-ssr\app.vue" />
     <Compile Include="app\views\web-ssr\ssr-client.js" />
     <Compile Include="app\views\web-ssr\ssr-server.js" />
     <Content Include="app\views\web-ssr\template.html" />
@@ -89,63 +100,31 @@
     <Content Include="app\views\web-ssr\components\footer.vue" />
     <Content Include="app\views\web-ssr\components\header.vue" />
     <Content Include="debug\vs\vs.njsproj" />
-    <Content Include="public\500\client-manifest.json" />
-    <Compile Include="public\500\main.js" />
-    <Compile Include="public\500\manifest.js" />
-    <Content Include="public\500\server-bundle.json" />
-    <Content Include="public\app\client-manifest.json" />
-    <Compile Include="public\app\main.js" />
-    <Compile Include="public\app\manifest.js" />
-    <Content Include="public\app\server-bundle.json" />
-    <Content Include="public\fonts\2fad952a20fbbcfd1bf2ebb210dccf7a.woff" />
-    <Content Include="public\fonts\6f0a76321d30f3c8120915e57f7bd77e.ttf" />
-    <Content Include="public\images\404.png" />
-    <Content Include="public\images\500.png" />
-    <Content Include="public\lib\base.css" />
-    <Compile Include="public\lib\base.js" />
-    <Content Include="public\ssr\client-manifest.json" />
-    <Compile Include="public\ssr\main.js" />
-    <Compile Include="public\ssr\manifest.js" />
-    <Content Include="public\lib\element-ui\index.css" />
-    <Compile Include="public\lib\element-ui\index.js" />
-    <Compile Include="public\lib\vue\vue-resource.min.js" />
-    <Compile Include="public\lib\vue\vue-router.js" />
-    <Compile Include="public\lib\vue\vue.min.js" />
-    <Compile Include="public\lib\vue\vuex.js" />
-    <Content Include="public\lib\element-ui\fonts\element-icons.ttf" />
-    <Content Include="public\lib\element-ui\fonts\element-icons.woff" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="app" />
     <Folder Include="app\controllers" />
     <Folder Include="app\controllers\processor" />
     <Folder Include="app\models" />
+    <Folder Include="app\node_modules\" />
     <Folder Include="app\services" />
     <Folder Include="app\views" />
     <Folder Include="app\views\images" />
     <Folder Include="app\views\lib" />
+    <Folder Include="app\views\lib\axios\" />
     <Folder Include="app\views\lib\element-ui" />
     <Folder Include="app\views\lib\element-ui\fonts" />
+    <Folder Include="app\views\lib\nprogress\" />
     <Folder Include="app\views\lib\vue" />
     <Folder Include="app\views\web" />
-    <Folder Include="app\views\web-ssr\user\" />
+    <Folder Include="app\views\web-ssr\500\" />
+    <Folder Include="app\views\web-ssr\app\" />
+    <Folder Include="app\views\web-ssr\app\user\" />
     <Folder Include="app\views\web\components" />
     <Folder Include="app\views\web\index" />
     <Folder Include="app\views\web\user" />
     <Folder Include="app\views\web-ssr" />
     <Folder Include="app\views\web-ssr\components" />
-    <Folder Include="debug" />
-    <Folder Include="debug\vs" />
-    <Folder Include="public" />
-    <Folder Include="public\500" />
-    <Folder Include="public\app" />
-    <Folder Include="public\fonts" />
-    <Folder Include="public\images" />
-    <Folder Include="public\lib" />
-    <Folder Include="public\lib\element-ui" />
-    <Folder Include="public\lib\element-ui\fonts" />
-    <Folder Include="public\lib\vue" />
-    <Folder Include="public\ssr" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->

@@ -1,3 +1,9 @@
+import Vue from "vue";
+import Vuex from "vuex";
+import axios from "axios";
+
+window.Vue = Vue;
+window.axios = axios;
 
 function api(options) {
     return new Promise((resolve, reject) => {
@@ -17,7 +23,7 @@ function api(options) {
                 resolve(data)
             }
         }).catch(reject);
-    })
+    });
 }
 
 function createStore(page, routes) {
@@ -39,14 +45,16 @@ function createStore(page, routes) {
     });
 }
 
+import VueRouter from "vue-router";
 function createRouter(page, routes) {
     Vue.use(VueRouter);
     return new VueRouter({
-//        mode: "history",
+        mode: "history",
         routes: routes
     });
 }
 
+import { sync } from 'vuex-router-sync';
 //page：vue页面
 //data：需要用来渲染页面的数据
 //routes：路由
@@ -77,7 +85,7 @@ function createApp({ page, routes }) {
     };
 }
 
-
+import { NProgress } from 'nprogress';
 export default ({ page, el, routes }) => {
 
     const { app, store, router } = createApp({ page, routes });
@@ -87,7 +95,7 @@ export default ({ page, el, routes }) => {
         page.asyncData({ store }).then(() => {
             app.$mount(el);
         });
-        return 
+        return;
     }
 
     //当路由组件重用（同一路由，但是 params 或 query 已更改，
@@ -95,20 +103,20 @@ export default ({ page, el, routes }) => {
     //我们也可以通过纯客户端(client - only)的全局 mixin 来处理这个问题：
     Vue.mixin({
         beforeRouteUpdate(to, from, next) {
-            const { asyncData } = this.$options
+            const { asyncData } = this.$options;
             if (asyncData) {
                 asyncData({
                     store: this.$store,
                     route: to
-                }).then(next).catch(next)
+                }).then(next).catch(next);
             } else {
-                next()
+                next();
             }
         }
-    })
+    });
 
     //加载进度条
-    NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
+    NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false });
 
 	router.onReady(() => {
 		// 添加路由钩子函数，用于处理 asyncData.
@@ -130,7 +138,7 @@ export default ({ page, el, routes }) => {
             // 组件数据通过执行asyncData方法获取
             const asyncDataHooks = activated.map(c => c.asyncData).filter(_ => _)
             if (!asyncDataHooks.length) {
-                return next()
+                return next();
             }
             // 这里如果有加载指示器(loading indicator)，就触发
             NProgress.start();
@@ -138,8 +146,8 @@ export default ({ page, el, routes }) => {
             Promise.all(asyncDataHooks.map(hook => hook({ store, route: to })))
                 .then(() => {
                     // 停止加载指示器(loading indicator)
-                    NProgress.done()
-                    next()
+                    NProgress.done();
+                    next();
                 })
                 .catch(next);
 		});

@@ -5,6 +5,8 @@ Vue.component('v-footer', footer);
 
 import error from './404.vue';
 
+error.title = document.title + '-Î´ÄÜÕÒµ½Ò³Ãæ';
+
 new Vue({
     el: '#app',
     render: h => h(error)

@@ -1,6 +1,7 @@
 const webpack = require("webpack");
 const webpackMerge = require('webpack-merge');
 const webpackBase = require('./webpack.base.js');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -13,6 +14,7 @@ let entrys = {};
 let plugins = [
     //把js和css注入到html文件里
     new HtmlWebpackInlineSourcePlugin(),
+    new ExtractTextPlugin("[name].css"),
     new CopyWebpackPlugin([{ from: "./app/views/lib", to: "lib" }]),
     new CopyWebpackPlugin([{ from: "./app/views/images", to: "images" }])
 ];

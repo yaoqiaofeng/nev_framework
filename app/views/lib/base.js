@@ -1,5 +1,5 @@
 Date.prototype.Format = function(fmt) { //author: meizz
-    var o = {
+    let o = {
         "M+": this.getMonth() + 1, //月份
         "d+": this.getDate(), //日
         "h+": this.getHours(), //小时
@@ -8,17 +8,24 @@ Date.prototype.Format = function(fmt) { //author: meizz
         "q+": Math.floor((this.getMonth() + 3) / 3), //季度
         "S": this.getMilliseconds() //毫秒
     };
-    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-    for (var k in o)
-        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    if (/(y+)/.test(fmt)) {
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    }
+    for (let k in o) {
+        if (new RegExp("(" + k + ")").test(fmt)) {
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        }
+    }
     return fmt;
 };
 
-var vup = {};
+let vup = {};
 vup.install = function(Vue, options) {
     Vue.prototype.vup = {
         loading: 0,
-        vue: null,
+        $message: null,
+        $confirm: null,
+        $loading: null,
         confirm(title, content){
             return new Promise((resolve, reject) => {
                 this.$confirm(content, title, {
@@ -33,7 +40,7 @@ vup.install = function(Vue, options) {
             });
         },
         message(title, content) {
-            this.vue.$alert(content, title);
+            this.$message(content, title);
         },
         free() {
             return this.loading <= 0;
@@ -41,7 +48,7 @@ vup.install = function(Vue, options) {
         begin(title) {
             this.loading = +1;
             if (this.loading > 0) {
-                this.vue.$loading({
+                this.$loading({
                     lock: true,
                     text: title
                 });
@@ -84,7 +91,7 @@ vup.install = function(Vue, options) {
         end() {
             this.loading = -1;
             if (this.loading <= 0) {
-                this.vue.$loading().close();
+                this.$loading().close();
                 this.loading = 0;
             }
         },
@@ -93,8 +100,8 @@ vup.install = function(Vue, options) {
                 this.begin("加载中");
             }
             return new Promise((resolve, reject) => {
-                thisaxios.get(url, options).then(
-                    response => {
+                axios.get(url, options)
+                    .then(response => {
                         if (options.load) {
                             this.end();
                         }
@@ -106,19 +113,17 @@ vup.install = function(Vue, options) {
                             data.code == 401 &&
                             options.autologin
                         ) {
-                            window.location.href = "user/login.html";
+                            window.location.href = options.loginurl;
                             resolve();
                         } else {
                             reject(data.message);
                         }
-                    },
-                    response => {
+                    }).catch(err => {
                         if (options.load) {
                             this.end();
                         }
-                        reject("未能连接到服务器");
-                    }
-                );
+                        reject(err);
+                    });
             });
         },
         post(url, body, options) {
@@ -126,8 +131,8 @@ vup.install = function(Vue, options) {
                 this.begin("提交中");
             }
             return new Promise((resolve, reject) => {
-                axios.post(url, body, options).then(
-                    response => {
+                axios.post(url, body, options)
+                    .then(response => {
                         if (options.load) {
                             this.end();
                         }
@@ -143,14 +148,12 @@ vup.install = function(Vue, options) {
                         } else {
                             reject(data.message);
                         }
-                    },
-                    response => {
+                    }).catch(err => {
                         if (options.load) {
                             this.end();
                         }
-                        reject("未能连接到服务器");
-                    }
-                );
+                        reject(err);
+                    });
             });
         },
         put(url, body, options) {
@@ -158,8 +161,8 @@ vup.install = function(Vue, options) {
                 this.begin("提交中");
             }
             return new Promise((resolve, reject) => {
-                axios.put(url, body, options).then(
-                    response => {
+                axios.put(url, body, options)
+                    .then(response => {
                         if (options.load) {
                             this.end();
                         }
@@ -175,23 +178,21 @@ vup.install = function(Vue, options) {
                         } else {
                             reject(data.message);
                         }
-                    },
-                    response => {
+                    }).catch(err => {
                         if (options.load) {
                             this.end();
                         }
-                        reject("未能连接到服务器");
-                    }
-                );
+                        reject(err);
+                    });
             });
         },
-        delete(url, body, options) {
+        delete(url, options) {
             if (options.load) {
                 this.begin("删除中");
             }
             return new Promise((resolve, reject) => {
-                axios.delete(url, options).then(
-                    response => {
+                axios.delete(url, options)
+                    .then(response => {
                         if (options.load) {
                             this.end();
                         }
@@ -207,45 +208,54 @@ vup.install = function(Vue, options) {
                         } else {
                             reject(data.message);
                         }
-                    },
-                    response => {
+                    }).catch(err => {
                         if (options.load) {
                             this.end();
                         }
-                        reject("未能连接到服务器");
-                    }
-                );
+                        reject(err);
+                    });
             });
         }
     };
 };
 Vue.use(vup);
-Vue.mixin({
-    mounted() {
-        this.vup.vue = this;
-    }
-});
 
-Vue.directive("title", {
-    inserted: function(el, binding) {
-        document.title = document.title + "-" + binding.value;
+Vue.mixin({
+    created() {
+        console.log('created');
+        this.vup.$message = this.$alert;
+        this.vup.$confirm = this.$confirm;
+        this.vup.$loading = this.$loading;
+        const title = this.$options.title;
+        if (title && this.$ssrContext) {
+            this.$ssrContext.title = $config.name+'-'+title;
+        }
+    },
+    mounted() {
+        console.log('mounted');
+        this.vup.$message = this.$alert;
+        this.vup.$confirm = this.$confirm;
+        this.vup.$loading = this.$loading;
+        const title = this.$options.title;
+        if (title && document) {
+            document.title = title;
+        }
     }
 });
 
 Vue.filter('datetime', function(value) {
-    var time = " " + new Date(value).getTime();
-    var time = time.substr(time.length - 5, 5);
+    let time = " " + new Date(value).getTime();
+    time = time.substr(time.length - 5, 5);
     if (time == '00000') {
         return new Date(value).Format('yyyy-MM-dd');
     } else if (time.trim() == "0") {
-        return ""
+        return "";
     } else {
         return new Date(value).Format('yyyy-MM-dd hh:mm:ss');
     }
 });
 
 Vue.filter('date', function(value) {
-    var time = " " + new Date(value).getTime();
     return new Date(value).Format('yyyy-MM-dd');
 });
 

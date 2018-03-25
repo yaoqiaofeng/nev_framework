@@ -6,7 +6,6 @@ const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-const domain = require("domain");
 const app = express();
 
 module.exports = function() {
@@ -69,8 +68,6 @@ module.exports = function() {
 	for (let i = 0; i < routers.length; i++) {
 		routers[i].listening(app);
 	}
-    //设置端口号
-    process.env.PORT = config.server.port;
 	//
 	app.listen(config.server.port);
 };

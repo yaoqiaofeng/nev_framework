@@ -50,13 +50,9 @@ module.exports = {
 			});
         });
 
-        app.get("/ssr/*", async function (req, res, next) {
+        app.get("/app/*", async function (req, res, next) {
             try {
-                let url = req.baseUrl;
-                url = url.replace('/ssr', '');
-                let html = await ssr({
-                    name: "/app", data: { user: req.result.user}, req, url
-                });
+                let html = await ssr({name: "app", data: { user: req.result.user}, req});
                 res.type('html');
                 res.end(html);
             } catch (err) {
@@ -82,7 +78,7 @@ module.exports = {
 			}
             try{
                 let html = await ssr({
-                    name: "/500", data: { message }, req
+                    name: "500", data: { message }, req
                 });
                 res.type('html');
 				res.end(html);

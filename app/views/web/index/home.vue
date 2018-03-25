@@ -1,5 +1,5 @@
 <template lang="html">   
-    <el-main class="home"  v-title="'首页'">
+    <el-main class="home">
     </el-main>
 </template>
 <style lang="scss">
