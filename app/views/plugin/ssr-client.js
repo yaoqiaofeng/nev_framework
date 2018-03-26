@@ -26,7 +26,7 @@ function api(options) {
     });
 }
 
-function createStore(page, routes) {
+function createStore(page) {
     Vue.use(Vuex);
     return new Vuex.Store({
         state: page.serverData,
@@ -85,7 +85,7 @@ function createApp({ page, routes }) {
     };
 }
 
-import { NProgress } from 'nprogress';
+import NProgress  from 'nprogress';
 export default ({ page, el, routes }) => {
 
     const { app, store, router } = createApp({ page, routes });

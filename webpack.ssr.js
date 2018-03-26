@@ -40,6 +40,12 @@ function doGetEntry(dir, template) {
                         //因为服务器是 Node，所以必须按照 commonjs 规范打包才能被服务器调用。
                         libraryTarget: 'commonjs2'
                     },
+                    resolve: {
+                        alias: {
+                            plugin: path.resolve(__dirname, 'app/views/plugin'),
+                            lib: path.resolve(__dirname, 'app/views/lib')
+                        }
+                    },
                     plugins: [
                         new ExtractTextPlugin(entry + "/[name].[chunkhash].css"),
                         new VueSSRServerPlugin({
@@ -56,6 +62,12 @@ function doGetEntry(dir, template) {
                     entry: file,
                     output: {
                         filename: entry + '/[name].js'
+                    },
+                    resolve: {
+                        alias: {
+                            plugin: path.resolve(__dirname, 'app/views/plugin'),
+                            lib: path.resolve(__dirname, 'app/views/lib')
+                        }
                     },
                     plugins: [
                         new ExtractTextPlugin(entry + "/[name].[chunkhash].css"),

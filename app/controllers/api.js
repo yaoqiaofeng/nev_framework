@@ -4,7 +4,7 @@ const fs = require("fs");
 const config = require("config");
 const User = Service("user");
 
-const upload = require("./processor/upload")(function(req){
+const upload = require("./plugin/upload")(function(req){
     return path.resolve(config.path.public + "/images/", req.result.user.username);
 }, "images", 5);
 

@@ -1,10 +1,10 @@
 const path = require("path");
 const fs = require("fs");
 const config = require("config");
-const ssr = require("./processor/vue-ssr");
+const ssr = require("./plugin/vue-ssr");
 
 //图片上传
-const upload = require("./processor/upload")(function(req){
+const upload = require("./plugin/upload")(function(req){
     return path.resolve(config.path.public + "/images/", req.result.user.username);
 }, "images", 5);
 
