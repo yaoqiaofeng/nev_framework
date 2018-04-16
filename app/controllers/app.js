@@ -45,7 +45,7 @@ module.exports = function() {
 
 	//加载所有路由的前置处理，最优先
 	for (let i = 0; i < routerlist.length; i++) {
-		if (routerlist[i] != "app.js" && routerlist[i] != "processor") {
+        if (routerlist[i] != "app.js" && routerlist[i] != "plugin") {
 			let router = require("./" + routerlist[i]);
 			routers.push(router);
 			if (router.init) {
@@ -56,7 +56,7 @@ module.exports = function() {
 
 	//加载所有路由的静态文件处理，在静态文件之前
 	for (let i = 0; i < routers.length; i++) {
-		if (routers.static) {
+		if (routers[i].static) {
 			routers[i].static(app);
 		}
 	}

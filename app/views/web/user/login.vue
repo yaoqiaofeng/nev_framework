@@ -25,7 +25,7 @@
 	</el-container>
 </template>
 <style lang="scss">
-@import "../var";
+@import "~style/var";
 .login {
     min-width: 100%;
     min-height: 100vh;

@@ -3,7 +3,7 @@
     </el-main>
 </template>
 <style lang="scss">
-@import "../var";
+@import "~style/var";
 </style>
 <script>
 export default {

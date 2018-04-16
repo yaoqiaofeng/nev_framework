@@ -20,7 +20,7 @@
     }
 </script>
 <style lang="scss">
-@import "./var";
+@import "~style/var";
 .index {
     background-color: $page-back;
     .index-content{        

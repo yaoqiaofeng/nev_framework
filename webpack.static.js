@@ -52,7 +52,18 @@ function doGetEntry(dir, template) {
 
 doGetEntry("./app/views/web/", "");
 
-module.exports = webpackMerge(webpackBase, {
+let webpackConfig = webpackMerge(webpackBase, {
 	entry: entrys,
 	plugins: plugins
 });
+
+function log(err, stats) {
+    if (err === null && stats.compilation.errors.length === 0) {
+        console.log(stats.compilation.options.entry + ' 编译成功');
+    } else {
+        console.log(stats.compilation.options.entry + ' 编译出现错误...');
+        console.log(stats.compilation.errors, err);
+    }
+}
+
+webpack(webpackConfig, log);

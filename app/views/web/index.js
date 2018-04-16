@@ -14,7 +14,7 @@ const router = new VueRouter({
 
 import index from './index.vue';
 
-index.title = document.title + '-Ê×Ò³';
+index.title = document.title + '-é¦–é¡µ';
 
 new Vue({
     el: '#app',

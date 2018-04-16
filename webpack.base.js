@@ -12,6 +12,13 @@ let config = {
 		//和入口文件的名字相同
 		filename: "[name].js"
     },
+	resolve: {
+	    alias: {
+	        plugin: path.resolve(__dirname, 'app/views/plugin'),
+            lib: path.resolve(__dirname, 'app/views/lib'),
+	        style: path.resolve(__dirname, 'app/views/style')
+	    }
+	},
     plugins: [],
 	module: {
 		//加载器，关于各个   加载器的参数配置，可自行搜索之。

@@ -14,8 +14,13 @@ function auth(req, res, next) {
 	} else if (req.result.user && req.result.user.id) {
 		next();
 	} else {
-		req.session.referrer = req.originalUrl;
-		res.redirect("/user/login.html");
+        let ext = req.originalUrl.match(/\.[a-zA-Z]*$/);
+        if (!ext || ext[0]=='.html'){
+            req.session.referrer = req.originalUrl;
+            res.redirect("/user/login.html");
+        } else {
+            next();
+        }        
 	}
 }
 

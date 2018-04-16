@@ -4,8 +4,6 @@ const Model=require("./app/node_modules/model");
 const Service=require("./app/node_modules/service");
 
 module.exports = {
-    app : null,
-
     // 加载模型 
     loadModels(dir){
         let fileList = fs.readdirSync(dir,'utf-8');
@@ -47,7 +45,7 @@ module.exports = {
     },
  
     // 初始化入口
-    init(app){
+    init(){
         Init(()=>{
             //初始化模型
             this.loadModels('./app/models/');
