@@ -5,20 +5,53 @@ const config = require("config");
 //图片上传
 const multer = require("multer");
 
-module.exports = function(dir, name, maxCount=5){
-    if (dir[0]!='\\') {
-        dir = '\\'+dir;
+//dir 提供一个函数或者一个固定路径，确认保存路径
+//file 提供一个函数或者文件名，确认保存文件名
+//mode 1为内存存储，其他为硬盘存储
+//filter 文件过滤函数
+//limit  上传文件大小限制
+module.exports = function(dir, filename, mode, filter, limit){
+    if (typeof dir=="string"){
+        if (dir[0]!='\\') {
+            dir = '\\'+dir;
+        }
+        if (dir[dir.length-1]!='\\') {
+            dir = dir+'\\';
+        }
     }
-    if (dir[dir.length-1]!='\\') {
-        dir = dir+'\\';
+    let storage;
+    if (mode==1) {
+        storage = multer.memoryStorage()
+    } else {
+        storage = multer.diskStorage({
+            destination: function(req, file, cb) {                
+                let path = dir;
+                if (typeof dir=="function"){
+                    path = dir(req);
+                }
+                fs.mkdir(path, function(err) {
+                    cb(null, path);
+                });
+            },
+            filename: function (req, file, cb) {  
+                let filepath;
+                if (filename){
+                    let filepath = filename;
+                    if (typeof filename=="function"){
+                        filepath = filename(req);
+                    }
+                } else {
+                    filepath = file.filename;
+                }
+            cb(null, filepath);
+            }
+        });
     }
-    let storage = multer.diskStorage({
-        destination: function(req, file, cb) {
-            let dir = dir(req);
-            fs.mkdir(dir, function(err) {
-                cb(null, dir);
-            });
+    return multer({ 
+        storage,
+        filter,
+        limit:{
+            fieldSize : limit
         }
     });
-    return multer({ storage }).fields([{ name, maxCount }]);
 }

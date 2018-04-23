@@ -6,7 +6,7 @@ const ssr = require("./plugin/vue-ssr");
 //图片上传
 const upload = require("./plugin/upload")(function(req){
     return path.resolve(config.path.public + "/images/", req.result.user.username);
-}, "images", 5);
+}).fields({name: "images", maxCount:5});
 
 function auth(req, res, next) {
 	if (req.baseUrl == "/user/login.html") {
@@ -38,22 +38,17 @@ module.exports = {
 			}
 		});
 
-        app.post("/images/upload", auth, function (req, res, next) {
-			upload(req, res, function(err) {
-				if (err) {
-					return res.json({ errno: err });
-				}
-				let images = req.files.images;
-				let data = [];
-				for (let i = 0; i < images.length; i++) {
-					data.push("/images/" +req.result.user.username +"/" +images[i].filename);
-				}
-				res.json({
-					errno: 0,
-					data: data
-				});
-			});
-        });
+        app.post("/images/upload", auth, upload, function (req, res, next) {
+            let images = req.files.images;
+            let data = [];
+            for (let i = 0; i < images.length; i++) {
+                data.push("/images/" +req.result.user.username +"/" +images[i].filename);
+            }
+            res.json({
+                errno: 0,
+                data: data
+            });
+	    });
 
         app.get("/app/*", async function (req, res, next) {
             try {

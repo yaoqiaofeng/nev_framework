@@ -2,6 +2,7 @@ const gulp = require('gulp');
 const uglify = require('gulp-uglify');
 const pump = require('pump');
 const babel = require('gulp-babel');
+const gulpif = require('gulp-if');
 
 
 gulp.task('config', function () {
@@ -38,6 +39,7 @@ gulp.task("uglifyApp", function (cb) {
 
 gulp.task("lib", function () {
     return  gulp.src(["app/views/lib/**/*.*"],{base:'app/views'})
+        .pipe(gulpif('*.js', babel()))
         .pipe(gulp.dest("public"));
     gulp.watch(['app/views/lib/**/*.*'], {cwd: 'app'}, reload);
 });

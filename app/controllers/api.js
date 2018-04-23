@@ -6,7 +6,8 @@ const User = Service("user");
 
 const upload = require("./plugin/upload")(function(req){
     return path.resolve(config.path.public + "/images/", req.result.user.username);
-}, "images", 5);
+}).fields({name: "images", maxCount:5});
+const uploadMemory =  require("./plugin/upload")(null, null, 1, null, 5000000).single("file");
 
 function Json(data, error) {
 	if (error) {
@@ -154,24 +155,18 @@ module.exports = {
 			result
 		);
 
-		app.post("/api/image", auth,
+		app.post("/api/image", auth, upload,
 			function(req, res, next) {
-				upload(req, res, function(err) {
-					if (err) {
-						req.result.error = err;
-						next();
-					}
-					let images = req.files.images;
-					let data = [];
-					for (let i = 0; i < images.length; i++) {
-						data.push("/images/" +req.result.user.username +"/" +images[i].filename);
-					}
-					req.result.data = data;
-					next();
-				});
+                let images = req.files.images;
+                let data = [];
+                for (let i = 0; i < images.length; i++) {
+                    data.push("/images/" +req.result.user.username +"/" +images[i].filename);
+                }
+                req.result.data = data;
+                next();
 			},
 			result
-		);
+        );
 
 		app.get("/api/:server", auth,
 			async function(req, res, next) {
@@ -179,10 +174,10 @@ module.exports = {
 				let server = Service(req.params.server);
 				if (server) {
                     try{
-                        req.result.data = await server.get(Object.assign(req.query, {
+                        req.result.data = await server.get(req.query, {
                             user_id: req.result.user.id,
                             identity: req.result.user.type
-                        }));
+                        });
                     } catch(err){
                         req.result.error = err;
                     }
@@ -200,10 +195,10 @@ module.exports = {
 				let server = Service(req.params.server);
 				if (server) {					
                     try{
-                        let data = await server.update(Object.assign(req.body, {
+                        let data = await server.update(req.body, {
 							user_id: req.result.user.id,
 							identity: req.result.user.type
-						}));
+						});
                         req.result.data = {
                             id: data
                         };
@@ -216,7 +211,54 @@ module.exports = {
                 next();
 			},
 			result
-		);
+        );
+        
+		app.post("/api/:server/import", auth, uploadMemory,
+            async function(req, res, next) {
+				console.log(req.params.server + ".import");
+				let server = Service(req.params.server);
+				if (server) {			
+                    try{
+                        let data = await server.import({
+                            filename: req.file.originalname,
+                            buffer: req.file.buffer
+                        },{	user_id: req.result.user.id,
+							identity: req.result.user.type
+						});
+                    } catch(err){
+                        req.result.error = err;
+                    }
+				} else {
+					req.result.error = "无可处理的服务";
+				}
+                next();
+			},
+			result
+        );
+        
+        app.post("/api/:server/export", auth, 
+            async function(req, res, next) {
+                console.log(req.params.server + ".export");
+                let server = Service(req.params.server);
+                if (server) {			
+                    try{
+                        let data = await server.export({format: "excel"},{
+                            user_id: req.result.user.id,
+                            identity: req.result.user.type
+                        });
+                        console.log(data);
+                        res.send(data);
+                    } catch(err){
+                        req.result.error = err;
+                        next();
+                    }
+                } else {
+                    req.result.error = "无可处理的服务";
+                    next();
+                }
+            },
+            result
+        );
 
 		app.put("/api/:server", auth,
 			async function(req, res, next) {
@@ -224,10 +266,10 @@ module.exports = {
 				let server = Service(req.params.server);
 				if (server) {				
                     try{
-                        let data = await server.add(Object.assign(req.body, {
+                        let data = await server.add(req.body, {
                             user_id: req.result.user.id,
                             identity: req.result.user.type
-                        }));
+                        });
                         req.result.data = {
                             id: data
                         };
@@ -248,10 +290,10 @@ module.exports = {
 				let server = Service(req.params.server);
 				if (server) {
 					try{
-                        await server.delete(Object.assign(req.body, {
+                        await server.delete(req.query, {
 							user_id: req.result.user.id,
 							identity: req.result.user.type
-						}));
+                        });
                     } catch(err){
                         req.result.error = err;
                     }
@@ -269,10 +311,10 @@ module.exports = {
 				let server = Service(req.params.server);
                 if (server) {
 					try{
-                        req.result.data = await server.list(Object.assign(req.query, {
+                        req.result.data = await server.list(req.query, {
 							user_id: req.result.user.id,
 							identity: req.result.user.type
-                        }));
+                        });
                     } catch(err){
                         req.result.error = err;
                     }
@@ -285,15 +327,15 @@ module.exports = {
 		);
 
 		app.get("/api/:server/all", auth,
-        async function(req, res, next) {
+            async function(req, res, next) {
 				console.log(req.params.server + ".all");
 				let server = Service(req.params.server);
 				if (server) {
 					try{
-                        req.result.data = await server.list(Object.assign(req.query, {
+                        req.result.data = await server.list(req.query, {
 							user_id: req.result.user.id,
 							identity: req.result.user.type
-						}))
+						})
                     } catch(err){
                         req.result.error = err;
                     }

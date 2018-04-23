@@ -13,10 +13,10 @@ const conf = require("./config");
 let entrys = {};
 let plugins = [
     //把js和css注入到html文件里
-    new HtmlWebpackInlineSourcePlugin(),
+   // new HtmlWebpackInlineSourcePlugin(),
     new ExtractTextPlugin("[name].css"),
-    new CopyWebpackPlugin([{ from: "./app/views/lib", to: "lib" }]),
-    new CopyWebpackPlugin([{ from: "./app/views/images", to: "images" }])
+ //   new CopyWebpackPlugin([{ from: "./app/views/lib", to: "lib", ignore: ['base.css', 'base.js']}]),
+//    new CopyWebpackPlugin([{ from: "./app/views/images", to: "images" }])
 ];
 
 function doGetEntry(dir, template) {
@@ -42,8 +42,12 @@ function doGetEntry(dir, template) {
                 filename: entry + ".html",
 				chunks: [entry],
 				title: conf.name,
-                template: template,
-                inlineSource: '.(js|css)$'
+                template: template,                
+                inlineSource: '.(js|css)$',
+                minify: {
+                    removeComments: true,
+                    collapseWhitespace: true
+                },
 			};
 			plugins.push(new HtmlWebpackPlugin(plugin));
 		}
