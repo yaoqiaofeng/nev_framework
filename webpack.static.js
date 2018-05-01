@@ -10,7 +10,8 @@ const path = require("path");
 const fs = require("fs");
 const conf = require("./config");
 
-let entrys = {};
+let entrys = {
+};
 let plugins = [
     //把js和css注入到html文件里
    // new HtmlWebpackInlineSourcePlugin(),
@@ -19,6 +20,27 @@ let plugins = [
 //    new CopyWebpackPlugin([{ from: "./app/views/images", to: "images" }])
 ];
 
+//编译公用链接库
+function doGetCommon(dir) {
+	let fileList = fs.readdirSync(dir, "utf-8");
+	let stat, file, entry, ext;
+	for (let i = 0; i < fileList.length; i++) {
+		file = dir + fileList[i];
+		stat = fs.lstatSync(file);
+		ext = path.extname(file);
+		// 是目录，需要继续
+		if (stat.isDirectory()) {
+			doGetCommon(file + "/");
+		} else if (ext==".js"){
+             entry = dir + path.basename(fileList[i], ext) ;
+            entry = entry.replace("./app/views/common/", "");
+			entrys[entry] = file;
+		}
+	}
+}
+doGetCommon("./app/views/common/lib/");
+
+//编译静态页面
 function doGetEntry(dir, template) {
 	try {
 		fs.accessSync(dir + "Template.html");
@@ -34,7 +56,7 @@ function doGetEntry(dir, template) {
 		if (stat.isDirectory()) {
 			doGetEntry(file + "/", template);
 		} else if (ext == ".js") {
-            entry = dir + path.basename(fileList[i], ext);
+            entry = dir + path.basename (fileList[i], ext);
             entry = entry.replace("./app/views/web/", "");
 			entrys[entry] = file;
 			let plugin = {

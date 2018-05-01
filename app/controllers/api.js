@@ -6,14 +6,14 @@ const User = Service("user");
 
 const upload = require("./plugin/upload")(function(req){
     return path.resolve(config.path.public + "/images/", req.result.user.username);
-}).fields({name: "images", maxCount:5});
+}).single("image");
 const uploadMemory =  require("./plugin/upload")(null, null, 1, null, 5000000).single("file");
 
 function Json(data, error) {
 	if (error) {
 		return {
 			result: "fail",
-			message: typeof error == "string" ? error : JSON.stringify(error)
+			message: typeof error == "string" ? error : error.toString()
 		};
 	} else {
 		return {
@@ -123,11 +123,11 @@ module.exports = {
 			async function(req, res, next) {
                 console.log("user.update");
                 try{
-                    await  User.update(Object.assign(req.body, {
+                    req.body.id = req.body.id ? req.body.id : req.result.user.id;
+                    await  User.update(req.body, {
                         user_id: req.result.user.id,
-                        identity: req.result.user.type,
-                        id: req.body.id ? req.body.id : req.result.user.id
-                    }));
+                        identity: req.result.user.type
+                    });
                     req.result.data = { result: "success" };
                 } catch(err){
                     req.result.error = err;
@@ -153,21 +153,23 @@ module.exports = {
                 next();
 			},
 			result
-		);
-
-		app.post("/api/image", auth, upload,
-			function(req, res, next) {
-                let images = req.files.images;
-                let data = [];
-                for (let i = 0; i < images.length; i++) {
-                    data.push("/images/" +req.result.user.username +"/" +images[i].filename);
-                }
-                req.result.data = data;
-                next();
+        );
+        
+		app.post("/api/image", auth, //upload,
+			function(req, res, next) {                
+                upload(req, res, function (err) {
+                    console.log(req.file);
+                    if (err) {
+                        req.result.error = err;
+                    } else {
+                        req.result.data = "/images/" +req.result.user.username +"/" +req.file.filename;
+                    }
+                    next();
+                });       
 			},
 			result
         );
-
+        
 		app.get("/api/:server", auth,
 			async function(req, res, next) {
 				console.log(req.params.server + ".get");
@@ -187,7 +189,7 @@ module.exports = {
                 next();
 			},
 			result
-		);
+        );
 
 		app.post("/api/:server", auth,
             async function(req, res, next) {
@@ -197,6 +199,7 @@ module.exports = {
                     try{
                         let data = await server.update(req.body, {
 							user_id: req.result.user.id,
+                            user_name: req.result.user.name,
 							identity: req.result.user.type
 						});
                         req.result.data = {
@@ -212,28 +215,29 @@ module.exports = {
 			},
 			result
         );
-        
+                    
 		app.post("/api/:server/import", auth, uploadMemory,
             async function(req, res, next) {
-				console.log(req.params.server + ".import");
-				let server = Service(req.params.server);
-				if (server) {			
+                console.log(req.params.server + ".import");
+                let server = Service(req.params.server);
+                if (server) {			
                     try{
                         let data = await server.import({
                             filename: req.file.originalname,
                             buffer: req.file.buffer
                         },{	user_id: req.result.user.id,
-							identity: req.result.user.type
-						});
+                            user_name: req.result.user.name,
+                            identity: req.result.user.type
+                        });
                     } catch(err){
                         req.result.error = err;
                     }
-				} else {
-					req.result.error = "无可处理的服务";
-				}
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
                 next();
-			},
-			result
+            },
+            result
         );
         
         app.post("/api/:server/export", auth, 
@@ -244,6 +248,7 @@ module.exports = {
                     try{
                         let data = await server.export({format: "excel"},{
                             user_id: req.result.user.id,
+                            user_name: req.result.user.name,
                             identity: req.result.user.type
                         });
                         console.log(data);
@@ -260,14 +265,15 @@ module.exports = {
             result
         );
 
-		app.put("/api/:server", auth,
-			async function(req, res, next) {
-				console.log(req.params.server + ".add");
-				let server = Service(req.params.server);
-				if (server) {				
+        app.put("/api/:server", auth,
+            async function(req, res, next) {
+                console.log(req.params.server + ".add");
+                let server = Service(req.params.server);
+                if (server) {				
                     try{
                         let data = await server.add(req.body, {
                             user_id: req.result.user.id,
+                            user_name: req.result.user.name,
                             identity: req.result.user.type
                         });
                         req.result.data = {
@@ -276,76 +282,132 @@ module.exports = {
                     } catch(err){
                         req.result.error = err;
                     }
-				} else {
-					req.result.error = "无可处理的服务";
-				}
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
                 next();
-			},
-			result
-		);
+            },
+            result
+        );
 
-		app.delete("/api/:server",auth,
-			async function(req, res, next) {
-				console.log(req.params.server + ".delete");
-				let server = Service(req.params.server);
-				if (server) {
-					try{
+        app.delete("/api/:server",auth,
+            async function(req, res, next) {
+                console.log(req.params.server + ".delete");
+                let server = Service(req.params.server);
+                if (server) {
+                    try{
                         await server.delete(req.query, {
-							user_id: req.result.user.id,
-							identity: req.result.user.type
+                            user_id: req.result.user.id,
+                            user_name: req.result.user.name,
+                            identity: req.result.user.type
                         });
                     } catch(err){
                         req.result.error = err;
                     }
-				} else {
-					req.result.error = "无可处理的服务";
-				}
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
                 next();
-			},
-			result
-		);
+            },
+            result
+        );
 
         app.get("/api/:server/list", auth,
             async function (req, res, next) {
                 console.log(req.params.server + ".list");
-				let server = Service(req.params.server);
+                let server = Service(req.params.server);
                 if (server) {
-					try{
+                    try{
+                        if (req.query.filter){
+                            req.query.filter = eval('('+req.query.filter+')');
+                        }
                         req.result.data = await server.list(req.query, {
-							user_id: req.result.user.id,
-							identity: req.result.user.type
+                            user_id: req.result.user.id,
+                            user_name: req.result.user.name,
+                            identity: req.result.user.type
                         });
                     } catch(err){
                         req.result.error = err;
                     }
-				} else {
-					req.result.error = "无可处理的服务";
-				}
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
                 next();
-			},
-			result
-		);
-
-		app.get("/api/:server/all", auth,
+            },
+            result
+        );
+        
+        app.get("/api/:server/all", auth,
             async function(req, res, next) {
-				console.log(req.params.server + ".all");
-				let server = Service(req.params.server);
-				if (server) {
-					try{
+                console.log(req.params.server + ".all");
+                let server = Service(req.params.server);
+                if (server) {
+                    try{
+                        if (req.query.filter){
+                            req.query.filter = eval('('+req.query.filter+')');
+                        }
                         req.result.data = await server.list(req.query, {
-							user_id: req.result.user.id,
-							identity: req.result.user.type
-						})
+                            user_id: req.result.user.id,
+                            user_name: req.result.user.name,
+                            identity: req.result.user.type
+                        })
                     } catch(err){
                         req.result.error = err;
                     }
-				} else {
-					req.result.error = "无可处理的服务";
-				}
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
                 next();
-			},
-			result
-		);
+            },
+            result
+        );
+
+        app.get("/api/:server/:name", auth,
+            async function(req, res, next) {
+                console.log(req.params.server + "."+req.params.name);
+                let server = Service(req.params.server);
+                let event = server[req.params.name];
+                if (server && event) {
+                    try{
+                        req.result.data = await event(req.query, {
+                            user_id: req.result.user.id,
+                            user_name: req.result.user.name,
+                            identity: req.result.user.type
+                        });
+                    } catch(err){
+                        req.result.error = err;
+                    }
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
+                next();
+            },
+            result
+        ); 
+
+        app.post("/api/:server/:name", auth,
+            async function(req, res, next) {
+                console.log(req.params.server + "."+req.params.name);
+                let server = Service(req.params.server);
+                let event = server[req.params.name];
+                if (server && event) {
+                    try{
+                        req.result.data = await event(req.body, {
+                            user_id: req.result.user.id,
+                            user_name: req.result.user.name,
+                            identity: req.result.user.type
+                        });
+                    } catch(err){
+                        req.result.error = err;
+                    }
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
+                next();
+            },
+            result
+        ); 
+
 
 		app.use("/api/*", function(req, res, next) {
 			res.json({

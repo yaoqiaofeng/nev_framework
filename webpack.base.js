@@ -10,13 +10,13 @@ let config = {
 		//浏览器会从这个目录开始查找模块
 		publicPath: "/",
 		//和入口文件的名字相同
-		filename: "[name].js"
+		filename: "[name]"
     },
 	resolve: {
 	    alias: {
 	        plugin: path.resolve(__dirname, 'app/views/plugin'),
             lib: path.resolve(__dirname, 'app/views/lib'),
-	        style: path.resolve(__dirname, 'app/views/style')
+	        style: path.resolve(__dirname, 'app/views/common/style')
 	    }
 	},
     plugins: [],
