@@ -1,0 +1,16 @@
+body{
+    margin: 0px;
+    font-family: "Microsoft Yahei,Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,SimSun,sans-serif";
+}
+
+/*高宽的模式*/
+*{
+    box-sizing: border-box;
+}
+
+/*去掉所有连接的下划线*/
+a,
+a:hover{
+    text-decoration: none;
+    color:inherit;
+}
