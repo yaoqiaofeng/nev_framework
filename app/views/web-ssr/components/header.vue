@@ -5,7 +5,7 @@
 
 
 <style lang="scss">
-@import "../var";
+@import "~style/var";
 .header {   
     background-color: $header-back; 
 }

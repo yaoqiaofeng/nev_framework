@@ -3,30 +3,28 @@ const fs = require("fs");
 const config = require("config");
 const ssr = require("./plugin/vue-ssr");
 
-//图片上传
-const upload = require("./plugin/upload")(function(req){
-    return path.resolve(config.path.public + "/images/", req.result.user.username);
-}).fields({name: "images", maxCount:5});
-
 function auth(req, res, next) {
-	if (req.baseUrl == "/user/login.html") {
+    if (req.originalUrl == "/user/login.html") {
 		next();
 	} else if (req.result.user && req.result.user.id) {
 		next();
 	} else {
         let ext = req.originalUrl.match(/\.[a-zA-Z]*$/);
-        if (!ext || ext[0]=='.html'){
-            req.session.referrer = req.originalUrl;
-            res.redirect("/user/login.html");
-        } else {
-            next();
-        }        
+        if (ext && ext[0]!='.html'){
+            return next();
+        }
+        let fix = req.originalUrl.match(/^\/api/);
+        if (fix){
+            return next();
+        }
+        req.session.referrer = req.originalUrl;
+        res.redirect("/user/login.html");
 	}
 }
 
 module.exports = {
 	static(app) {
-		app.use("/*.html", auth);
+		app.use(auth);
 	},
 
 	listening(app) {
@@ -37,18 +35,6 @@ module.exports = {
 				res.redirect("/index.html");
 			}
 		});
-
-        app.post("/images/upload", auth, upload, function (req, res, next) {
-            let images = req.files.images;
-            let data = [];
-            for (let i = 0; i < images.length; i++) {
-                data.push("/images/" +req.result.user.username +"/" +images[i].filename);
-            }
-            res.json({
-                errno: 0,
-                data: data
-            });
-	    });
 
         app.get("/app/*", async function (req, res, next) {
             try {

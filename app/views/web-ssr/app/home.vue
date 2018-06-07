@@ -14,6 +14,7 @@ export default {
     },
     methods: {
         onGotoLogin() {
+            console.log('AAAAA');
             this.$router.push({ path: '/app/user/login' })
         }
     }

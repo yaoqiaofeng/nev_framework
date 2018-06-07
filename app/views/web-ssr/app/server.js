@@ -7,7 +7,7 @@ import footer from '../components/footer.vue';
 Vue.component('v-header', header);
 Vue.component('v-footer', footer);
 Vue.use(ElementUI);
-import  'lib/base.js';
+import  'js/base/base.js';
 
 let routes = [
     { path: '/app/user/login', component: () => import('./user/login.vue')},

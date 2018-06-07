@@ -7,8 +7,10 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const app = express();
+const  compression = require('compression');
 
 module.exports = function() {
+    app.use(compression());
 	//// parse `application/json`
 	app.use(bodyParser.json());
 	// parse `application/x-www-form-urlencoded`
@@ -52,7 +54,7 @@ module.exports = function() {
 				router.init(app);
 			}
 		}
-	}
+    }
 
 	//加载所有路由的静态文件处理，在静态文件之前
 	for (let i = 0; i < routers.length; i++) {

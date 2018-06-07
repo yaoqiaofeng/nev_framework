@@ -1,6 +1,6 @@
-var modelObject = require("modelObject");
+var {CacheModel} = require("modelObject");
 
-class user extends modelObject{
+class user extends CacheModel{
     static fields(){
         return ['username','name','tel','email','type','wx_openId','image'];
     }

@@ -1,7 +1,7 @@
 /*
  *   用户模块
  * */
-const serviceObject = require("serviceObject");
+const {CacheService} = require("serviceObject");
 const db = require('db');
 const model = require('model');
 const moment= require("moment");
@@ -11,24 +11,23 @@ const crypto = require('crypto');
 const cache = require('cache');
 const fs = require("fs");
 
-class user extends serviceObject{
+class user extends CacheService{
 
    static name() {
         return "user";
     } 
 
-    static doAuth(data, op) {
+    static doAuth(data, env, op) {
         if ((op=='get') || (op=='list')){
-            switch (data.identity) {
+            switch (env.identity) {
                 case 'admin':
                     return true;
                 default: 
                     throw '权限不足';
             }
-        } else if (data.identity=='admin') {
-            if (op=='add') data.password = crypto.createHash('md5').update('8888').digest('hex'); 
+        } else if ((op=='update') && (data.id==env.user_id)){
             return true
-        } else if ((op=='update') && (data.id==data.user_id)){
+        } else if (env.identity=='admin') {
             return true;
         } else {
             return false;
@@ -37,39 +36,34 @@ class user extends serviceObject{
 
     //获取列表数据的处理过程
     //data: 传递外部调用的数据
-    //dataset: 获取的列表数据
-    static async doFilter(data, dataset) {
-        switch (data.identity) {
+    static async doFilter(data, env, row) {
+        switch (env.identity) {
             case 'admin':
-                return dataset;
+                return this.filterByObject(data.filter, row) && this.search(row, ['username','name','tel','email'], data.search);;
             default:
                 return [];
         }
     }
 
-    //处理搜索的过程
-    //data: 传递外部调用的数据
-    //dataset: 获取的列表数据
-    static doSearch(data, dataset){
-        return this.search(dataset, ['username','name','tel','email'], data.search);;
-    }
 
-    static async change(data) {
+    static async change(data, env) {
         console.log('service.user.change');
         data.password = crypto.createHash('md5').update(data.password).digest('hex');
         let User = model("user");
         let user = await User.select({
-            id : data.user_id,
+            id : env.user_id,
             password: data.password
         });
         if (user.length==0){
             throw '密码错误！';
         }
-        let row = {};
+        let row = {
+            id: env.user_id
+        };
         if (data.new_username) {
             let all = await User.select();
             for(let i=0; i<all.length; i++){
-                if ((all[i].id != data.user_id) && (all[i].username==data.new_username)){
+                if ((all[i].id != env.user_id) && (all[i].username==data.new_username)){
                     throw "用户名已存在，请选择其他用户名！";
                 }
             }
@@ -136,7 +130,7 @@ class user extends serviceObject{
                 };
             } else {
                 throw "没有找到该用户，请检查用户名或者密码！";
-            }                 
+            }               
         } else {
             throw "没有找到该用户，请检查用户名或者密码！";
         }    
@@ -148,6 +142,21 @@ class user extends serviceObject{
 
     static token_decode(token) {
         return jwt.decode(token, secret);
+    }
+
+	static async doUpdate(data, env, conn, multi) {
+        if (data.password){
+            data.password = crypto.createHash('md5').update(data.password).digest('hex').toUpperCase();
+        }
+        return super.doUpdate(data, env, conn, multi);
+    }
+
+	static async doAdd(data, env, conn, multi) {
+        if (!data.type){
+            throw "必须用户类型";
+        }
+        data.password = crypto.createHash('md5').update('8888').digest('hex').toUpperCase();
+        return super.doAdd(data, env, conn, multi);
     }
 
     static  async valid(data){
@@ -177,7 +186,6 @@ class user extends serviceObject{
             return {};
         }   
     } 
-    //
 }
 
 module.exports = user; 

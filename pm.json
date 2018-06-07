@@ -1,0 +1,11 @@
+{
+  "apps": [{
+    "name"        : "nev",                
+    "watch"       :  ["./app"],           
+    "ignore_watch" : ["./public"],        
+    "script"      : "app.js",               
+    "interpreter" : "babel-node",         
+    "instances" : "max",                  
+    "exec_mode" : "cluster"               
+  }]
+}

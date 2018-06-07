@@ -1,4 +1,3 @@
-const path = require("path");
 const fs = require("fs");
 const config = require("config");
 
@@ -23,7 +22,7 @@ module.exports = function(dir, filename, mode, filter, limit){
     if (mode==1) {
         storage = multer.memoryStorage()
     } else {
-        storage = multer.diskStorage({
+        storage ={
             destination: function(req, file, cb) {                
                 let path = dir;
                 if (typeof dir=="function"){
@@ -32,20 +31,18 @@ module.exports = function(dir, filename, mode, filter, limit){
                 fs.mkdir(path, function(err) {
                     cb(null, path);
                 });
-            },
-            filename: function (req, file, cb) {  
-                let filepath;
-                if (filename){
-                    let filepath = filename;
-                    if (typeof filename=="function"){
-                        filepath = filename(req);
-                    }
-                } else {
-                    filepath = file.filename;
-                }
-            cb(null, filepath);
             }
-        });
+        }
+        if (filename){
+            storage.filename =  function (req, file, cb) {  
+                let filepath = filename;
+                if (typeof filename=="function"){
+                    filepath = filename(req);
+                }
+                cb(null, filepath);
+            }
+        }
+        storage = multer.diskStorage(storage);
     }
     return multer({ 
         storage,

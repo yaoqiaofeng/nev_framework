@@ -4,7 +4,7 @@
 </template>
 
 <style lang="scss">
-@import "../var";
+@import "~style/var";
 .footer{
     background-color : $footer-back;
 }

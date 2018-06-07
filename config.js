@@ -6,7 +6,8 @@ module.exports = {
             "password" : "root",
             "database"  : "nev",
             "supportBigNumbers" : true,
-            "stringifyObjects" : true
+            "stringifyObjects" : true,
+            "dateStrings": true
         },
         "redis" : {
             "host": "",
@@ -14,7 +15,7 @@ module.exports = {
         }
     },
 
-    name: 'nev',
+    name: '易卡通',
     
     //服务运行配置模块
     server:{

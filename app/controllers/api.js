@@ -7,6 +7,7 @@ const User = Service("user");
 const upload = require("./plugin/upload")(function(req){
     return path.resolve(config.path.public + "/images/", req.result.user.username);
 }).single("image");
+
 const uploadMemory =  require("./plugin/upload")(null, null, 1, null, 5000000).single("file");
 
 function Json(data, error) {
@@ -113,22 +114,15 @@ module.exports = {
                 next();
 			},
 			result
-		);
-
-		app.get("/api/user/valid", auth, function(req, res) {
-			res.json(Json(req.result.user, req.result.error));
-		});
-
-		app.post("/api/user", auth,
+        );
+        
+		app.get("/api/user/logout",
 			async function(req, res, next) {
-                console.log("user.update");
+				console.log("user.logout");
                 try{
-                    req.body.id = req.body.id ? req.body.id : req.result.user.id;
-                    await  User.update(req.body, {
-                        user_id: req.result.user.id,
-                        identity: req.result.user.type
-                    });
-                    req.result.data = { result: "success" };
+                    //正常登陆
+                    res.cookie("access_token", '', {maxAge: 0});
+                    req.session.access_token = '';
                 } catch(err){
                     req.result.error = err;
                 }
@@ -137,16 +131,19 @@ module.exports = {
 			result
 		);
 
+		app.get("/api/user/valid", auth, function(req, res) {
+			res.json(Json(req.result.user, req.result.error));
+		});
+
 		app.post("/api/user/change", auth,
 			async function(req, res, next) {
 				console.log("user.change");
                 try{
-                    await User.change({
-						id: req.result.user.id,
-						password: req.body.password,
-						new_username: req.body.new_username,
-						new_password: req.body.new_password
-					});
+                    await User.change(req.body, {
+                        user_id: req.result.user.id,
+                        user_name: req.result.user.name,
+                        identity: req.result.user.type
+                    });
                 } catch(err){
                     req.result.error = err;
                 }
@@ -168,8 +165,8 @@ module.exports = {
                 });       
 			},
 			result
-        );
-        
+        );		
+
 		app.get("/api/:server", auth,
 			async function(req, res, next) {
 				console.log(req.params.server + ".get");
@@ -178,7 +175,8 @@ module.exports = {
                     try{
                         req.result.data = await server.get(req.query, {
                             user_id: req.result.user.id,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         });
                     } catch(err){
                         req.result.error = err;
@@ -200,7 +198,8 @@ module.exports = {
                         let data = await server.update(req.body, {
 							user_id: req.result.user.id,
                             user_name: req.result.user.name,
-							identity: req.result.user.type
+							identity: req.result.user.type,
+                            user: req.result.user
 						});
                         req.result.data = {
                             id: data
@@ -225,9 +224,11 @@ module.exports = {
                         let data = await server.import({
                             filename: req.file.originalname,
                             buffer: req.file.buffer
-                        },{	user_id: req.result.user.id,
+                        },{	
+                            user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         });
                     } catch(err){
                         req.result.error = err;
@@ -246,23 +247,26 @@ module.exports = {
                 let server = Service(req.params.server);
                 if (server) {			
                     try{
-                        let data = await server.export({format: "excel"},{
+                        let data = await server.export(req.body,{
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         });
-                        console.log(data);
                         res.send(data);
                     } catch(err){
-                        req.result.error = err;
-                        next();
+                        res.send(JSON.stringify({
+                            result: "fail",
+                            message: typeof err == "string" ? err : err.toString()
+                        }));
                     }
                 } else {
-                    req.result.error = "无可处理的服务";
-                    next();
+                    res.send(JSON.stringify({
+                        result: "fail",
+                        message: "无可处理的服务"
+                    }));
                 }
-            },
-            result
+            }
         );
 
         app.put("/api/:server", auth,
@@ -274,7 +278,8 @@ module.exports = {
                         let data = await server.add(req.body, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         });
                         req.result.data = {
                             id: data
@@ -299,7 +304,8 @@ module.exports = {
                         await server.delete(req.query, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         });
                     } catch(err){
                         req.result.error = err;
@@ -324,7 +330,8 @@ module.exports = {
                         req.result.data = await server.list(req.query, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         });
                     } catch(err){
                         req.result.error = err;
@@ -349,7 +356,8 @@ module.exports = {
                         req.result.data = await server.list(req.query, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         })
                     } catch(err){
                         req.result.error = err;
@@ -366,13 +374,21 @@ module.exports = {
             async function(req, res, next) {
                 console.log(req.params.server + "."+req.params.name);
                 let server = Service(req.params.server);
-                let event = server[req.params.name];
-                if (server && event) {
+                if (server) {
+                    //检测暴露的api
+                    let expose = server.expose('get');
+                    if (expose !== null){
+                        if (expose.indexOf(req.params.name)==-1){
+                            req.result.error = "无可处理的服务";
+                            return next();                            
+                        }
+                    }
                     try{
-                        req.result.data = await event(req.query, {
+                        req.result.data = await server[req.params.name](req.query, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            user: req.result.user
                         });
                     } catch(err){
                         req.result.error = err;
@@ -389,10 +405,17 @@ module.exports = {
             async function(req, res, next) {
                 console.log(req.params.server + "."+req.params.name);
                 let server = Service(req.params.server);
-                let event = server[req.params.name];
-                if (server && event) {
+                if (server) {
+                    //检测暴露的api
+                    let expose = server.expose('post');
+                    if (expose !== null){
+                        if (expose.indexOf(req.params.name)==-1){
+                            req.result.error = "无可处理的服务";
+                            return next();                            
+                        }
+                    }
                     try{
-                        req.result.data = await event(req.body, {
+                        req.result.data = await server[req.params.name](req.body, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type

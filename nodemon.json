@@ -1,0 +1,10 @@
+{
+    "restartable": "rs",
+    "ignoreRoot": [".git", "node_modules", "bower_components", ".sass-cache"],
+    "ignore": [
+        ".svn",
+        "public",
+        "app/views"
+    ],
+    "verbose": true
+}

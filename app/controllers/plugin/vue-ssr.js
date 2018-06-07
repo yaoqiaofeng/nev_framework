@@ -17,38 +17,29 @@ const createRenderer = (bundle, options) => createBundleRenderer(bundle, Object.
 
 let rendererMap = {};
 
-function getRenderer(dir, template){
-	try {
-		fs.accessSync(path.resolve(dir + "template.html"));
-		template = fs.readFileSync(path.resolve(dir + "template.html"), 'utf8');
-	} catch (err) {}
-	let fileList = fs.readdirSync(dir, "utf-8");
+function getRenderer(dir){
+	let fileList = fs.readdirSync(dir+'/', "utf-8");
 	for (let filename of fileList) {
-		let file = dir + filename;
+		let file = dir +'/'+ filename;
 		let stat = fs.lstatSync(file);
-		let ext = path.extname(file);
 		// 是目录，需要继续
 		if (stat.isDirectory()) {          
-			getRenderer(file + "/", template);
-		} else if (ext == ".js") {
-            if ((filename=='ssr-client.js') || (filename=='ssr-server.js')){
-                continue;
-            }
-            if (filename == 'server.js') {
-                let basepath = dir.replace('app/views/web-ssr', "");
-                let url = dir.replace('app/views/web-ssr/', "");
-                url = url.substr(0, url.length-1);
-                let clientManifest = require(path.resolve(config.path.public+basepath+'/client-manifest.json'));
-                let bundle = require(path.resolve(config.path.public +basepath+'/server-bundle.json'));
-                rendererMap[url] = createRenderer(bundle, {
-                    template, clientManifest 
-                 });
-            }
-        }
+			getRenderer(file);
+        } 
+    }
+    if (fs.existsSync(dir+'/client-manifest.json') && fs.existsSync(dir+'/server-bundle.json')
+        && fs.existsSync(dir+'/template.html')){
+        let url = dir.replace(config.path.public+'/', "");
+        let clientManifest = require(path.resolve( dir+'/client-manifest.json'));
+        let bundle = require(path.resolve(dir+'/server-bundle.json'));
+        let template = fs.readFileSync(path.resolve(dir+'/template.html'),"utf-8");
+        rendererMap[url] = createRenderer(bundle, {
+            template, clientManifest 
+         });
     }
 }
 
-getRenderer('app/views/web-ssr/');
+getRenderer(config.path.public);
 
 function render({ name, data, req }) {
     let context = {
@@ -57,6 +48,7 @@ function render({ name, data, req }) {
         data: data,
         cookies: req.cookies
     };
+    console.log(rendererMap);
     return new Promise((resolve, reject)=>{
         rendererMap[name].renderToString(context, (err, html) => {
             if (err) {

@@ -1,16 +1,17 @@
 const gulp = require('gulp');
 const uglify = require('gulp-uglify');
+const babel = require('gulp-babel');
 const pump = require('pump');
 
 
 gulp.task('config', function () {
-    return gulp.src([".babelrc",".esintrc","app.json","config.js","package.json"])
+    return gulp.src([".babelrc",".esintrc","pm.js","config.js","package.json"])
         .pipe(gulp.dest("dist"));
 });
 
 gulp.task("uglify", function (cb) {
     pump([
-        gulp.src(["app.js","load.js"]),
+        gulp.src(["app.js","load.js","batch.js"]),
         babel(),
         uglify(),
         gulp.dest('./dist')
@@ -26,7 +27,7 @@ gulp.task("public", function () {
 
 gulp.task("uglifyApp", function (cb) {
     pump([
-        gulp.src(["app/controllers/**/*.js","app/models/**/*.js","app/node_modules/**/*.js"],{base:'app'}),
+        gulp.src(["app/controllers/**/*.js","app/models/**/*.js","app/node_modules/**/*.js","app/services/**/*.js"],{base:'app'}),
         babel(),
         uglify(),
         gulp.dest('./dist/app')
@@ -51,7 +52,7 @@ gulp.task("watch", function () {
 });
 
 if (process.env.NODE_ENV=== 'production'){
-    gulp.task('default', ['config','uglify','uglifyApp', 'public']);
+    gulp.task('default', ['lib','images','config','uglify','uglifyApp', 'public']);
 } else {
     gulp.task('default', ["lib","images",'watch']);
 }

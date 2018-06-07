@@ -1,54 +1,30 @@
 const {spawn} = require('child_process');
+const fs = require('fs');
 
-// common code
-const gulp = spawn('npm.cmd', ["run", "dev-gulp"]);
-const static = spawn('npm.cmd', ["run", "dev-static"]);
-const server = spawn('npm.cmd', ["run", "dev-server"]);
-
-gulp.stdout.on('data', (data) => {
-    process.stdout.write(data);
-});
-
-gulp.stderr.on('data', (data) => {
-    process.stdout.write(data);
-});
-
-gulp.on('close', (code) => {
-    console.log(`gulp退出码：${code}`);
-});
-
-gulp.on('error', (err) => {
-    console.log('启动gulp失败：', err);
-});
-
-static.stdout.on('data', (data) => {
-    process.stdout.write(data);
-});
-
-static.stderr.on('data', (data) => {
-    process.stdout.write(data);
-});
-
-static.on('close', (code) => {
-    console.log(`webpack退出码：${code}`);
-});
-
-static.on('error', (err) => {    
-    console.log('启动webpack失败：', err);
-});
-
-server.stdout.on('data', (data) => {
-    process.stdout.write(data);
-});
-
-server.stderr.on('data', (data) => {
-    process.stdout.write(data);
-});
-
-server.on('close', (code) => {
-    console.log(`server退出码：${code}`);
-});
-
-server.on('error', (err) => {
-    console.log('启动server失败：', err);
-});
+function run(name, cmd, params){
+    const p = spawn(cmd, params);
+    p.stdout.on('data', (data) => {
+        process.stdout.write(data);
+    });
+    
+    p.stderr.on('data', (data) => {
+        process.stdout.write(data);
+    });
+    
+    p.on('close', (code) => {
+        console.log(`${name}退出码：${code}`);
+    });
+    
+    p.on('error', (err) => {
+        pconsole.log(`${name}启动失败：`, err);
+    });
+}
+ 
+if (fs.existsSync('app/views/web')){
+    run('static','npm.cmd', ["run", "dev-static"]);
+}
+if (fs.existsSync('app/views/web-ssr')){
+    run('ssr','npm.cmd', ["run", "dev-ssr"]);
+}
+run('gulp','npm.cmd', ["run", "dev-gulp"]);
+run('server','npm.cmd', ["run", "dev-server"]);

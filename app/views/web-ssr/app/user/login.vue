@@ -22,7 +22,7 @@
     </el-main>
 </template>
 <style lang="scss">
-@import "../../var";
+@import "~style/var";
     .login {
         background-color: page-back;
         flex-grow: 1;

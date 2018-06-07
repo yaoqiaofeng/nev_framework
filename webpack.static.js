@@ -4,7 +4,6 @@ const webpackBase = require('./webpack.base.js');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const path = require("path");
 const fs = require("fs");
