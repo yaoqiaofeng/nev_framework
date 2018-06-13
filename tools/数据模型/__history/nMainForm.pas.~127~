@@ -274,9 +274,9 @@ var
             begin
               ATable := ListView1.Items[i].SubItems[0];                              
               ATablePrev := FieldByName('TABLE_NAME').AsString;
-              System.Delete(ATablePrev, Pos(' ',ATablePrev), MaxInt);
+              ATablePrev := Copy(ATablePrev,1,Pos(' ',ATablePrev)-1);
               AliaseNamePrev := FieldByName('TABLE_NAME').AsString;
-              System.Delete(AliaseNamePrev, 0, Pos(' ',AliaseNamePrev));
+              AliaseNamePrev := Copy(AliaseNamePrev,Pos(' ',AliaseNamePrev)+1,MaxInt);
               ATable := StringReplace(ATable,'#self', ATablePrev, [rfReplaceAll, rfIgnoreCase]);
               AFix := ListView1.Items[i].SubItems[3];
               AKey := ListView1.Items[i].SubItems[1];

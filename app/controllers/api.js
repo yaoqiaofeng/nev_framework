@@ -91,12 +91,7 @@ module.exports = {
 				console.log("user.login");
                 try{
                     //正常登陆
-                    let username = req.query.username;
-                    let password = req.query.password;
-                    let userinfo =await User.login({
-                        username: username,
-                        password: password
-                     });
+                    let userinfo =await User.login(req.query);
                     let token = User.token(userinfo);
                     if (req.query.remember) {
                         res.cookie("access_token", token, {
@@ -199,7 +194,8 @@ module.exports = {
 							user_id: req.result.user.id,
                             user_name: req.result.user.name,
 							identity: req.result.user.type,
-                            user: req.result.user
+                            user: req.result.user,
+                            query: req.query
 						});
                         req.result.data = {
                             id: data
@@ -228,7 +224,8 @@ module.exports = {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
-                            user: req.result.user
+                            user: req.result.user,
+                            query: req.query
                         });
                     } catch(err){
                         req.result.error = err;
@@ -251,7 +248,8 @@ module.exports = {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
-                            user: req.result.user
+                            user: req.result.user,
+                            query: req.query
                         });
                         res.send(data);
                     } catch(err){
@@ -279,7 +277,8 @@ module.exports = {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
-                            user: req.result.user
+                            user: req.result.user,
+                            query: req.query
                         });
                         req.result.data = {
                             id: data
@@ -418,7 +417,8 @@ module.exports = {
                         req.result.data = await server[req.params.name](req.body, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
-                            identity: req.result.user.type
+                            identity: req.result.user.type,
+                            query: req.query
                         });
                     } catch(err){
                         req.result.error = err;

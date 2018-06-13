@@ -1,6 +1,5 @@
 const fs = require("fs");
 const config = require("config");
-
 //图片上传
 const multer = require("multer");
 
@@ -23,7 +22,8 @@ module.exports = function(dir, filename, mode, filter, limit){
         storage = multer.memoryStorage()
     } else {
         storage ={
-            destination: function(req, file, cb) {                
+            destination: function(req, file, cb) {       
+                console.log(file);
                 let path = dir;
                 if (typeof dir=="function"){
                     path = dir(req);

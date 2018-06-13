@@ -30,10 +30,15 @@ type
     TabSheet2: TTabSheet;
     ListView1: TListView;
     UniQuery1: TUniQuery;
+    DBGridEh2: TDBGridEh;
+    UniTable1: TUniTable;
+    UniDataSource2: TUniDataSource;
+    UniConnection2: TUniConnection;
     procedure Button1Click(Sender: TObject);
     procedure HTMLCheckList1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     function GetDataName(DataType: string): string;
@@ -74,6 +79,12 @@ begin
     MYSQL_ExportSQL
   else if UniConnection1.ProviderName = 'SQL Server' then
     MSSQL_ExportSQL
+end;
+
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  UniConnection2.Database := ExtractFilePath(Application.ExeName)+'data.mdb';
+  UniTable1.Open;
 end;
 
 function TMainForm.GetDataName(DataType: string): string;
@@ -254,8 +265,7 @@ var
     L: TStringList;
     J: Integer;
     Aliase: Integer;
-    AFields, ATable, AliaseName, AFix, AKey,
-    ATablePrev, AliaseNamePrev: string;
+    AFields, ATable, AliaseName: string;
     Bk: TBookmark;
   begin
     result := tableName;
@@ -272,27 +282,22 @@ var
           begin
             if ListView1.Items[i].Caption = FieldByName('COLUMN_NAME').AsString then
             begin
-              ATable := ListView1.Items[i].SubItems[0];                              
-              ATablePrev := FieldByName('TABLE_NAME').AsString;
-              System.Delete(ATablePrev, Pos(' ',ATablePrev), MaxInt);
-              AliaseNamePrev := FieldByName('TABLE_NAME').AsString;
-              System.Delete(AliaseNamePrev, 0, Pos(' ',AliaseNamePrev));
-              ATable := StringReplace(ATable,'#self', ATablePrev, [rfReplaceAll, rfIgnoreCase]);
-              AFix := ListView1.Items[i].SubItems[3];
-              AKey := ListView1.Items[i].SubItems[1];
+              ATable := ListView1.Items[i].SubItems[0];
+              if ATable='#self' then
+                ATable := tableName;
               Inc(Aliase);
               AliaseName := Char(Aliase);
               AFields := AFields+space(28);
-              Result := Result + ' left join'+space(28)+ATable+' '+AliaseName+' on '+
-                AliaseName+'.'+AKey+'='+AliaseNamePrev+'.'+FieldByName('COLUMN_NAME').AsString;
+              Result := Result + ' left join'+space(28)+ATable+' '+AliaseName+' on '+AliaseName+
+                '.'+ListView1.Items[i].SubItems[1]+'='+tableName+'.'+FieldByName('COLUMN_NAME').AsString;
               L.Delimiter := ',';
               L.DelimitedText := ListView1.Items[i].SubItems[2];
               Bk := GetBookmark;
               for J := 0 to L.count - 1 do
               begin
                 Append;
-                FieldByName('TABLE_NAME').AsString :=  ATable+' '+AliaseName;
-                FieldByName('Column_Name').AsString :=  AFix+'_'+L[j];
+           //     FieldByName('TABLE_NAME').AsString :=  ATable;
+                FieldByName('Column_Name').AsString :=  ListView1.Items[i].SubItems[3]+'_'+L[j];
                 UniQuery1.Close;
                 UniQuery1.SQL.text := 'select * from sys.columns where name=:name and object_name(object_id)=:object_name';
                 UniQuery1.ParamByName('name').AsString := L[j];
@@ -303,7 +308,7 @@ var
                 FieldByName('DATA_PRECISION').AsString:= UniQuery1.FieldByName('PRECISION').AsString;
                 FieldByName('DATA_SCALE').AsString :=  UniQuery1.FieldByName('SCALE').AsString;
                 UniQuery1.Close;
-                AFields := AFields + ','+ATable+'.'+L[j]+' as '+AFix+'_'+L[j];
+                AFields := AFields + ','+ATable+'.'+L[j]+' as '+ListView1.Items[i].SubItems[3]+'_'+L[j];
               end;
               GotoBookmark(Bk);
               break;

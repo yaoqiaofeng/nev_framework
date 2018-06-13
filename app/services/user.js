@@ -1,7 +1,7 @@
 /*
  *   用户模块
  * */
-const {CacheService} = require("serviceObject");
+const {ModelService} = require("serviceObject");
 const db = require('db');
 const model = require('model');
 const moment= require("moment");
@@ -11,7 +11,7 @@ const crypto = require('crypto');
 const cache = require('cache');
 const fs = require("fs");
 
-class user extends CacheService{
+class user extends ModelService{
 
    static name() {
         return "user";
@@ -179,7 +179,6 @@ class user extends CacheService{
                 name: dataset[0].name,
                 tel: dataset[0].tel,
                 type: dataset[0].type,
-                authentication: dataset[0].authentication,
                 email: dataset[0].email
             };
         } else {
