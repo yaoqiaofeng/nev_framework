@@ -2,14 +2,11 @@
  *   用户模块
  * */
 const {ModelService} = require("serviceObject");
-const db = require('db');
 const model = require('model');
 const moment= require("moment");
 const jwt = require('jwt-simple');
 const secret = require('config').jwt.secret;
 const crypto = require('crypto');
-const cache = require('cache');
-const fs = require("fs");
 
 class user extends ModelService{
 
