@@ -1,5 +1,8 @@
 ﻿/node_modules/
 .vscode/
+__history/
+*.dcu
+/tools/数据模型/models/
 public/
 dist/
 debug/

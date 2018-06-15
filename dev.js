@@ -1,7 +1,8 @@
 const {spawn} = require('child_process');
 const fs = require('fs');
 
-function run(name, cmd, params){
+function run(name, params){
+    let cmd = /win32/ig.test(process.platform)?'npm.cmd':'npm';
     const p = spawn(cmd, params);
     p.stdout.on('data', (data) => {
         process.stdout.write(data);
@@ -16,15 +17,15 @@ function run(name, cmd, params){
     });
     
     p.on('error', (err) => {
-        pconsole.log(`${name}启动失败：`, err);
+        console.log(`${name}启动失败：`, err);
     });
 }
  
 if (fs.existsSync('app/views/web')){
-    run('static','npm.cmd', ["run", "dev-static"]);
+    run('static', ["run", "dev-static"]);
 }
 if (fs.existsSync('app/views/web-ssr')){
-    run('ssr','npm.cmd', ["run", "dev-ssr"]);
+    run('ssr', ["run", "dev-ssr"]);
 }
-run('gulp','npm.cmd', ["run", "dev-gulp"]);
-run('server','npm.cmd', ["run", "dev-server"]);
+run('gulp', ["run", "dev-gulp"]);
+run('server', ["run", "dev-server"]);
