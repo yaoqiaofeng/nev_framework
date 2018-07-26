@@ -2,25 +2,26 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const config = require("config");
-const logger = require("morgan");
+const logger = require('logger');
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const app = express();
-const  compression = require('compression');
+const compression = require('compression');
+const server = require('http').createServer(app);
 
 module.exports = function() {
     app.use(compression());
 	//// parse `application/json`
-	app.use(bodyParser.json());
+	app.use(bodyParser.json({limit: '10mb'}));
 	// parse `application/x-www-form-urlencoded`
-	app.use(bodyParser.urlencoded({ extended: true }));
-	//启用cookie
+	app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+   //启用cookie
 	app.use(cookieParser());
 	//启用seesion
 	app.use(session({ secret: config.session.secret }));
 	// 记录请求日志
-	app.use(logger("tiny"));
+	logger.express(app);
 	//最优先的处理请求
     app.use(function (req, res, next) {
 		//响应options请求
@@ -45,6 +46,8 @@ module.exports = function() {
 	let routerlist = fs.readdirSync(__dirname, "utf-8");
 	let routers = [];
 
+    app.server = server;
+    
 	//加载所有路由的前置处理，最优先
 	for (let i = 0; i < routerlist.length; i++) {
         if (routerlist[i] != "app.js" && routerlist[i] != "plugin") {
@@ -71,5 +74,5 @@ module.exports = function() {
 		routers[i].listening(app);
 	}
 	//
-	app.listen(config.server.port);
+	server.listen(config.server.port);
 };

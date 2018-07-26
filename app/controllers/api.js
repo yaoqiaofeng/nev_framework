@@ -1,6 +1,6 @@
 ﻿const Service = require("service");
 const path = require("path");
-const fs = require("fs");
+const logger = require('logger');
 const config = require("config");
 const User = Service("user");
 
@@ -12,6 +12,7 @@ const uploadMemory =  require("./plugin/upload")(null, null, 1, null, 5000000).s
 
 function Json(data, error) {
 	if (error) {
+        logger.error(typeof error == "string" ? error : error.toString());
 		return {
 			result: "fail",
 			message: typeof error == "string" ? error : error.toString()
@@ -38,6 +39,21 @@ function auth(req, res, next) {
 			message: "user authentication failed"
 		});
 	}
+}
+
+function funNameFix(name){
+    let upper = false;
+    name = name.split('');
+    for(let i=0; i<name.length; i++){
+        if (name[i]=='_' || name['-']){
+            upper = true
+        } else if (upper){
+            name.splice(i-1,2,name[i].toUpperCase());
+            i -= 1;
+            upper = false;
+        }
+    }
+    return name.join('');
 }
 
 module.exports = {
@@ -190,12 +206,11 @@ module.exports = {
 				let server = Service(req.params.server);
 				if (server) {					
                     try{
-                        let data = await server.update(req.body, {
+                        let data = await server.update(Object.assign(req.body, req.query), {
 							user_id: req.result.user.id,
                             user_name: req.result.user.name,
 							identity: req.result.user.type,
-                            user: req.result.user,
-                            query: req.query
+                            user: req.result.user
 						});
                         req.result.data = {
                             id: data
@@ -217,15 +232,14 @@ module.exports = {
                 let server = Service(req.params.server);
                 if (server) {			
                     try{
-                        let data = await server.import({
+                        let data = await server.import(Object.assign({
                             filename: req.file.originalname,
                             buffer: req.file.buffer
-                        },{	
+                        },req.query),{	
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
-                            user: req.result.user,
-                            query: req.query
+                            user: req.result.user
                         });
                     } catch(err){
                         req.result.error = err;
@@ -244,12 +258,11 @@ module.exports = {
                 let server = Service(req.params.server);
                 if (server) {			
                     try{
-                        let data = await server.export(req.body,{
+                        let data = await server.export(Object.assign(req.body, req.query),{
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
-                            user: req.result.user,
-                            query: req.query
+                            user: req.result.user
                         });
                         res.send(data);
                     } catch(err){
@@ -273,12 +286,11 @@ module.exports = {
                 let server = Service(req.params.server);
                 if (server) {				
                     try{
-                        let data = await server.add(req.body, {
+                        let data = await server.add(Object.assign(req.body, req.query), {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
                             user: req.result.user,
-                            query: req.query
                         });
                         req.result.data = {
                             id: data
@@ -369,6 +381,36 @@ module.exports = {
             result
         );
 
+        app.get("/api/public/:server/:name", 
+            async function(req, res, next) {
+                console.log(req.params.server + "."+req.params.name);
+                let server = Service(req.params.server);
+                if (server) {
+                    //检测暴露的api
+                    let expose = server.exposePublic('get');
+                    if (!expose || expose.length==0 || expose.indexOf(req.params.name)==-1){
+                        req.result.error = "无可处理的服务";
+                        return next();
+                    }
+                    try{
+                        let func =  server[req.params.name]||server[funNameFix(req.params.name)];
+                        req.result.data = await func.apply(server, [req.query, {
+                            user_id: req.result.user.id || "",
+                            user_name: req.result.user.name || "",
+                            identity: req.result.user.type  || "",
+                            user: req.result.user
+                        }]);
+                    } catch(err){
+                        req.result.error = err;
+                    }
+                } else {
+                    req.result.error = "无可处理的服务";
+                }
+                next();
+            },
+            result
+        ); 
+
         app.get("/api/:server/:name", auth,
             async function(req, res, next) {
                 console.log(req.params.server + "."+req.params.name);
@@ -383,12 +425,13 @@ module.exports = {
                         }
                     }
                     try{
-                        req.result.data = await server[req.params.name](req.query, {
+                        let func =  server[req.params.name]||server[funNameFix(req.params.name)];
+                        req.result.data = await func.apply(server, [req.query, {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
                             user: req.result.user
-                        });
+                        }]);
                     } catch(err){
                         req.result.error = err;
                     }
@@ -414,12 +457,13 @@ module.exports = {
                         }
                     }
                     try{
-                        req.result.data = await server[req.params.name](req.body, {
+                        let func =  server[req.params.name]||server[funNameFix(req.params.name)];
+                        req.result.data = await func.apply(server, [Object.assign(req.body, req.query), {
                             user_id: req.result.user.id,
                             user_name: req.result.user.name,
                             identity: req.result.user.type,
-                            query: req.query
-                        });
+                            user: req.result.user
+                        }]);
                     } catch(err){
                         req.result.error = err;
                     }

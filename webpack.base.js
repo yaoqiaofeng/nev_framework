@@ -16,8 +16,9 @@ let config = {
 	    alias: {
 	        plugin: path.resolve(__dirname, 'app/views/plugin'),
             lib: path.resolve(__dirname, 'app/views/lib'),
-            js: path.resolve(__dirname, 'app/views/common/lib'),
-	        style: path.resolve(__dirname, 'app/views/common/style')
+	        js: path.resolve(__dirname, 'app/views/common/lib'),
+	        style: path.resolve(__dirname, 'app/views/common/style'),
+	        script: path.resolve(__dirname, 'app/views/common/script')
 	    }
 	},
     plugins: [],

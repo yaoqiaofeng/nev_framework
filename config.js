@@ -33,5 +33,17 @@ module.exports = {
 
     session: {
         secret: "8047832D44F34C92972C3DB33998586B"
+    },
+
+    logger: {
+        appenders: {
+            out: { type: 'stdout' },
+            app: { type: 'file', filename: 'application.log' },
+            error: { type: 'file', filename: 'error.log' }
+        },
+        categories: { 
+            default: { appenders: [ 'out', 'app' ], level: 'info' },
+            error: { appenders: [ 'out', 'app', 'error'], level: 'error' }
+        }
     }
 }

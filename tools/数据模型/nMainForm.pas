@@ -8,7 +8,7 @@ uses
   UniLoader, DB, Uni, SQLServerUniProvider, UniProvider,
   MySQLUniProvider, PostgreSQLUniProvider, MemDS, AdvSplitter, DBGridEhGrouping,
   ToolCtrlsEh, DBGridEhToolCtrls, DynVarsEh, GridsEh, DBAxisGridsEh, DBGridEh,
-  ComCtrls, ADODB, ODBCUniProvider, AccessUniProvider;
+  ComCtrls, ADODB, ODBCUniProvider, AccessUniProvider, RegExpr2;
 
 type
   TMainForm = class(TForm)
@@ -27,13 +27,18 @@ type
     Button3: TButton;
     PageControl1: TPageControl;
     TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
     ListView1: TListView;
     UniQuery1: TUniQuery;
+    ListView2: TListView;
+    TabSheet4: TTabSheet;
+    PageControl2: TPageControl;
+    TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
     procedure Button1Click(Sender: TObject);
     procedure HTMLCheckList1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     function GetDataName(DataType: string): string;
@@ -74,6 +79,25 @@ begin
     MYSQL_ExportSQL
   else if UniConnection1.ProviderName = 'SQL Server' then
     MSSQL_ExportSQL
+end;
+
+procedure TMainForm.FormCreate(Sender: TObject);
+var
+  i : integer;
+  t : string;
+  s : TStringList;
+  j: Integer;
+begin
+  S := TStringList.Create;
+  for I := 0 to ListView1.Items.Count - 1 do
+  begin
+    t := ListView1.Items[i].Caption;
+    for j := 0 to ListView1.Items[i].SubItems.Count - 1 do
+      t := t+#9+ListView1.Items[i].SubItems[j];
+    s.Add(t);
+  end;
+  s.SaveToFile('join.conf');
+  s.Free;
 end;
 
 function TMainForm.GetDataName(DataType: string): string;
@@ -254,7 +278,7 @@ var
     L: TStringList;
     J: Integer;
     Aliase: Integer;
-    AFields, ATable, AliaseName, AFix, AKey,
+    AFields, ATable, AliaseName, AFix, AKey, AAsName,
     ATablePrev, AliaseNamePrev: string;
     Bk: TBookmark;
   begin
@@ -272,12 +296,17 @@ var
           begin
             if ListView1.Items[i].Caption = FieldByName('COLUMN_NAME').AsString then
             begin
-              ATable := ListView1.Items[i].SubItems[0];                              
+              ATable := ListView1.Items[i].SubItems[0];      
               ATablePrev := FieldByName('TABLE_NAME').AsString;
+              ATable := StringReplace(ATable,'#self', ATablePrev, [rfReplaceAll, rfIgnoreCase]);
+              if (ListView1.Items[i].SubItems.Count= 5) and not
+                ExecRegExpr(ListView1.Items[i].SubItems[4], ATable) then
+              begin
+                Continue;
+              end;
               System.Delete(ATablePrev, Pos(' ',ATablePrev), MaxInt);
               AliaseNamePrev := FieldByName('TABLE_NAME').AsString;
               System.Delete(AliaseNamePrev, 0, Pos(' ',AliaseNamePrev));
-              ATable := StringReplace(ATable,'#self', ATablePrev, [rfReplaceAll, rfIgnoreCase]);
               AFix := ListView1.Items[i].SubItems[3];
               AKey := ListView1.Items[i].SubItems[1];
               Inc(Aliase);
@@ -303,7 +332,10 @@ var
                 FieldByName('DATA_PRECISION').AsString:= UniQuery1.FieldByName('PRECISION').AsString;
                 FieldByName('DATA_SCALE').AsString :=  UniQuery1.FieldByName('SCALE').AsString;
                 UniQuery1.Close;
-                AFields := AFields + ','+ATable+'.'+L[j]+' as '+AFix+'_'+L[j];
+                if (Pos(AFix+'_', L[j])=0) then
+                  AAsName := AFix+'_'+L[j] else
+                  AAsName := L[j];
+                AFields := AFields + ','+AliaseName+'.'+L[j]+' as '+AAsName;
               end;
               GotoBookmark(Bk);
               break;
@@ -320,7 +352,7 @@ var
     end;
   end;
 var
-  I: Integer;
+  I, J: Integer;
   M: TMemoryStream;
   js, path, tableName, col, dt, tb : string;
   sql_i,sql_i_v, sql_d, sql_u, sql_s, sql_s_s : string;
@@ -360,7 +392,7 @@ begin
           begin
             if sql_s_s <> '' then
               sql_s_s := sql_s_s+' OR ';
-            sql_s_s := sql_s_s + space(29)+'.'+col+' like ''%@search%''';
+            sql_s_s := sql_s_s + space(29)+col+' like ''%@search%''';
           end;
           //增删改语句
           if (tb = tableName) then
@@ -388,10 +420,19 @@ begin
         end;
         //组合
         sql_u := sql_u+space(16)+'where id={{id}}';
-        sql_i := sql_i+') '+space(16)+'values('+sql_i_v+')';
+        sql_i := sql_i+') '+space(16)+'values('+sql_i_v+')';        
         if (sql_s_s<>'') then
           sql_s_s := space(25)+'{if @search} and ('+sql_s_s+space(25)+') {endif @search}';
-        sql_s := sql_s+sql_s_s+
+        for J := 0 to ListView2.Items.Count - 1 do
+        begin
+          if (ListView2.Items[J].Caption = tableName) then
+          begin
+            sql_s_s := sql_s_s+space(25)+ListView2.Items[J].SubItems[0];
+          end;
+        end;
+        sql_s := sql_s+                             
+           space(25)+'{if @sql}{{@sql}}{endif @sql}'+
+           sql_s_s+
            space(25)+'{if @sort}'+space(29)+'order by {{@sort}}'+
            space(29)+'{if @page}OFFSET {{@offset}} ROW FETCH NEXT {{@limit}} ROWS only {endif @page}'+
            space(25)+'{endif @sort}';
