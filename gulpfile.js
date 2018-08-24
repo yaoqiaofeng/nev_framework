@@ -20,7 +20,7 @@ gulp.task("uglify", function (cb) {
     );
 });
 
-gulp.task("public", function () {
+gulp.task("public", ['lib', 'images'], function () {
     return  gulp.src(["public/**/*.*"],{base:'public'})
         .pipe(gulp.dest("dist/public"));
 });
