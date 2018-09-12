@@ -13,21 +13,20 @@
 * 根目录
 1. app.js 服务器启动脚本
 2. pm.js pm2的配置文件，可以使用个pm2 pm.js启动脚本
-3. batch.js 服务器脚本启动前会调用的预处理函数
+3. loader.js 模块，服务，配置，路由，数据模型的及加载器
 4. config.js 配置文件
 5. gulpfile.js gulp的配置文件
-6. load.js 自动加载路由，模块，服务的脚本
-7. webpack.base.js webpack的基本配置
-8. webpack.static.js webpack静态打包的配置
-9. webpack.ssr.js webpack服务器渲染的打包配置
-10. dist 存放用gulp生成用于生产环境的服务端内容
-11. public 静态文件路径，配置文件里可定义
-12. app 服务端的内容目录
+6. webpack.base.js webpack的基本配置
+7. webpack.static.js webpack静态打包的配置
+8. webpack.ssr.js webpack服务器渲染的打包配置
+9. dist 存放用gulp生成用于生产环境的服务端内容
+10. public 静态文件路径，配置文件里可定义
+11. app 服务端的内容目录
 * app目录
 1. controllers 存放路由模块的目录
 2. models 存放表模型的目录
 3. services 存放服务的目录
-4. node_modules 核心模块的目录
+4. modules 存放模块的目录
 5. views 存放前端的目录
 * controllers目录
 1. app.js 路由的进入点，自动加载路由的模块
@@ -52,29 +51,24 @@
 ### 核心模块
 #### cache
 缓存模块，用于快速读写redis
-#### config
-配置模块，加载根目录下的config.js，用于全局方便加载
+#### date
+日期处理模块
+#### logger
+日志模块
 #### db
 数据库模块，提供数据库读写接口
-#### init
-初始化模块
-#### model
-表模型获取和注册模块
 #### modelObject
 表模型基类
-#### service
-服务获取和注册模块
 #### serviceObject
 服务基类
 
 ## 部署方法
 ---
 ### 开发环境
-1. 运行npm run static 开启静态模式打包。
-2. 运行npm run ssr 开启服务端渲染模式打包
-3. 运行npm start 开启服务器
+1. 运行npm start 开启开发服务器
 ### 生产环境
 1. 运行npm build打包生产环境
 2. 把dist目录拷贝到生产环境
-3. 在生产环境安装pm2
-4. 在生产环境的dist目录下执行pm2  pm.js
+3. npm install
+4. 在生产环境安装pm2
+5. 在生产环境的dist目录下执行pm2  pm.js

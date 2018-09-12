@@ -1,8 +1,8 @@
 /*
  *   用户模块
  * */
-const {ModelService} = require("serviceObject");
-const model = require('model');
+const {ModelService} = modules("serviceObject");
+const models = modules('models');
 const moment= require("moment");
 const jwt = require('jwt-simple');
 const secret = require('config').jwt.secret;
@@ -46,7 +46,7 @@ class user extends ModelService{
     static async change(data, env) {
         console.log('service.user.change');
         data.password = crypto.createHash('md5').update(data.password).digest('hex');
-        let User = model("user");
+        let User = models("user");
         let user = await User.select({
             id : env.user_id,
             password: data.password
@@ -74,7 +74,7 @@ class user extends ModelService{
 
     static async register(data) {
         console.log('service.user.register');
-        let User = model("user");
+        let User = models("user");
         let all = await User.select();
         for(let i=0; i<all.length; i++){
             if (all[i].username==data.username){
@@ -106,7 +106,7 @@ class user extends ModelService{
     //password:
     static async login(data) {
         console.log('service.user.login');
-        let User = model("user");
+        let User = models("user");
         let user = {};
         let all = await User.select();
         for(let i=0; i<all.length; i++){
@@ -167,7 +167,7 @@ class user extends ModelService{
         } else {
             return {};
         }
-        let User = model("user");
+        let User = models("user");
         let dataset = await User.select(row);
         if (dataset.length>0){
             return {

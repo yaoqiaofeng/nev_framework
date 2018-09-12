@@ -1,11 +1,9 @@
-﻿const Service = require("service");
-const path = require("path");
-const logger = require('logger');
-const config = require("config");
-const User = Service("user");
+﻿const path = require("path");
+const logger = modules('logger');
+const User = services("user");
 
 const upload = require("./plugin/upload")(function(req){
-    return path.resolve(config.path.public + "/images/", req.result.user.username);
+    return path.resolve(configs.path.public + "/images/", req.result.user.username);
 }).single("image");
 
 const uploadMemory =  require("./plugin/upload")(null, null, 1, null, 5000000).single("file");

@@ -1,7 +1,5 @@
-﻿const Service = require("service");
-const moment = require('moment');
-const config = require('config');
-const User = Service("user");
+﻿const moment = require('moment');
+const User = services("user");
 const http = require('http');
 
 
@@ -26,14 +24,14 @@ function result(req, res) {
 module.exports = {
 	listening(app) {
         //初始化服务器
-        const wsPort = parseInt(config.server.port)+(process.env.NODE_APP_INSTANCE===undefined?1:process.env.NODE_APP_INSTANCE);
+        const wsPort = parseInt(configs.server.port)+(process.env.NODE_APP_INSTANCE===undefined?1:process.env.NODE_APP_INSTANCE);
         const wsServer = http.createServer();
         const io = require('socket.io')(wsServer);
         wsServer.listen(wsPort);
         const redis = require('socket.io-redis');
         let redis_db = {
-            host: config.db.redis.host,
-            port: config.db.redis.port,
+            host: configs.db.redis.host,
+            port: configs.db.redis.port,
             db: 15,
         }        
         io.adapter(redis(redis_db));

@@ -1,8 +1,6 @@
 /*
  *   数据库模块
  * */
-const config = require('./config');
-
 class db{
 
     /**
@@ -109,7 +107,7 @@ function GetMySQL(){
     class mysql_db extends db{
 
         static init(){	
-            pool = mysql.createPool(config.db.mysql);
+            pool = mysql.createPool(configs.db.mysql);
         }
 
         static begin(data) {
@@ -309,7 +307,7 @@ function GetSQLServer(){
 
         static begin(data) {
             return new Promise((resolve, reject) => {
-                let conf = Object.assign({}, config.db.mssql);
+                let conf = Object.assign({}, configs.db.mssql);
                 if (data.db) {
                     conf.database = data.db;
                 }
@@ -532,8 +530,8 @@ function GetSQLServer(){
     return mssql_db;
 }
 
-if (config.db.mysql){
+if (configs.db.mysql){
     module.exports = GetMySQL()
-} else if (config.db.mssql){
+} else if (configs.db.mssql){
     module.exports = GetSQLServer();
 }

@@ -1,6 +1,4 @@
 const fs = require("fs");
-const config = require("config");
-//图片上传
 const multer = require("multer");
 
 //dir 提供一个函数或者一个固定路径，确认保存路径

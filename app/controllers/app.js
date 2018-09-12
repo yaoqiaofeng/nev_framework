@@ -1,8 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
-const config = require("config");
-const logger = require('logger');
+const logger = modules('logger');
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
@@ -19,7 +18,7 @@ module.exports = function() {
    //启用cookie
 	app.use(cookieParser());
 	//启用seesion
-	app.use(session({ secret: config.session.secret }));
+	app.use(session({ secret: configs.session.secret }));
 	// 记录请求日志
 	logger.express(app);
 	//最优先的处理请求
@@ -67,12 +66,12 @@ module.exports = function() {
 	}
 
 	//静态文件处理
-	app.use(express.static(path.resolve(config.path.public)));
+	app.use(express.static(path.resolve(configs.path.public)));
 
 	//加载所有路由的普通处理
 	for (let i = 0; i < routers.length; i++) {
 		routers[i].listening(app);
 	}
 	//
-	server.listen(config.server.port);
+	server.listen(configs.server.port);
 };

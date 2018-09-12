@@ -3,14 +3,19 @@
  */
 
 const redis = require("redis");
-const config = require("./config");
-const redisClient  = redis.createClient(config.db.redis);
+const redisClient  = redis.createClient(configs.db.redis);
 
 const cache = {
+
+    init(){	
+        this.clear();
+    }
+
     //返回事务
     begin(){
         return redisClient.multi();
     },
+
     //应用事务
     commit(multi){            
         return new Promise(function (resolve, reject) {
@@ -20,6 +25,7 @@ const cache = {
             });
         });
     },
+
     rollback(multi){            
         return new Promise(function (resolve, reject) {
             multi.discard(function (err, replies) {
@@ -28,12 +34,14 @@ const cache = {
             })
         });
     },
+
     model: {
-        del: function(name, id, multi){
+
+        del(name, id, multi){
             if (!multi) multi = redisClient;
             multi.del(name+':'+id);
         },
-        get: function(name, id){      
+        get(name, id){      
             return new Promise(function (resolve, reject) {
                 redisClient.hgetall(name+':'+id, function (err, object) {
                     if (err) return reject(err);
@@ -41,7 +49,7 @@ const cache = {
                 });
             });
         },        
-        inc: function(name, value, multi){ 
+        inc(name, value, multi){ 
             return new Promise(function (resolve, reject) {
                 let transaction = multi?true:false;
                 if (!multi) multi = redisClient.multi();
@@ -59,7 +67,7 @@ const cache = {
                 });
             });
         },
-        set: function(name, value, multi){
+        set(name, value, multi){
             return new Promise(function (resolve, reject) {
                 let transaction = multi?true:false;
                 if (!multi) multi = redisClient.multi();
@@ -78,7 +86,7 @@ const cache = {
             });
         },
 
-        getall: function(name, multi){                        
+        getall(name, multi){                        
             return new Promise(function (resolve, reject) {
                 redisClient.keys(name+':*', function (err, replies) {
                    // if (!multi)
@@ -94,7 +102,7 @@ const cache = {
             });
         },
         
-        setall: function(name, value, multi){           
+        setall(name, value, multi){           
             return new Promise(function (resolve, reject) {                 
                 redisClient.keys(name+':*', function (err, replies) {
                     let transaction = multi?true:false;
@@ -120,10 +128,12 @@ const cache = {
             });
         }
     },
-    clear: function () {
+
+    clear () {
         redisClient.flushdb();
     },
-    get: function(name){
+
+    get(name){
         return new Promise(function (resolve, reject) {
             redisClient.get(name, function (err, reply) {
                 if (err) return reject(err);
@@ -131,7 +141,8 @@ const cache = {
             });
         });
     },
-    set: function(name, value){
+
+    set(name, value){
         return new Promise(function (resolve, reject) {
             redisClient.set(name, value, function (err, reply) {
                 if (err) return reject(err);
@@ -139,9 +150,11 @@ const cache = {
             });
         });
     },
+
     expire(name, seconds){
         redisClient.expire(name, seconds)        
     }
+
 };
 
-module.exports=cache;
+module.exports = cache;

@@ -1,11 +1,10 @@
-const batch = require("./batch");
-const load = require("./load");
-const logger = require("./app/node_modules/logger");
-batch(function(){
-    //
-    load.init();
-});
+const load = require("./loader");
+
+// 加载器
+loader.init();
+
 // 打印异常日志
 process.on("uncaughtException", error => {
+    let logger = modules('logger');
     logger.error(error);
 });

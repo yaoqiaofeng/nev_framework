@@ -1,12 +1,13 @@
 
 const log4js = require('log4js');
-const config = require('./config');
+
 let logger;
+
 // 记录请求日志
 module.exports = {
 
     init(){
-        log4js.configure(config.logger);
+        log4js.configure(configs.logger);
         logger =  log4js.getLogger('error');
         logger.level = 'logger.error(msg);';
     },

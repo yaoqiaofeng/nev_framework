@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs");
-const config = require("config");
 const LRU = require('lru-cache');
 
 //服务器渲染
@@ -29,7 +28,7 @@ function getRenderer(dir){
     }
     if (fs.existsSync(dir+'/client-manifest.json') && fs.existsSync(dir+'/server-bundle.json')
         && fs.existsSync(dir+'/template.html')){
-        let url = dir.replace(config.path.public+'/', "");
+        let url = dir.replace(configs.path.public+'/', "");
         let clientManifest = require(path.resolve( dir+'/client-manifest.json'));
         let bundle = require(path.resolve(dir+'/server-bundle.json'));
         let template = fs.readFileSync(path.resolve(dir+'/template.html'),"utf-8");
@@ -39,12 +38,12 @@ function getRenderer(dir){
     }
 }
 
-getRenderer(config.path.public);
+getRenderer(configs.path.public);
 
 function render({ name, data, req }) {
     let context = {
         url: req.path,
-        title: config.name,
+        title: configs.name,
         data: data,
         cookies: req.cookies
     };

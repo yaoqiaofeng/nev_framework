@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs");
-const config = require("config");
 const ssr = require("./plugin/vue-ssr");
 
 function auth(req, res, next) {
@@ -52,7 +51,7 @@ module.exports = {
 
 		app.get("*", function(req, res, next) {
 			res.type("html");
-			res.sendFile(path.resolve(config.path.public + "/404.html"));
+			res.sendFile(path.resolve(configs.path.public + "/404.html"));
         });
 
 		app.use(async function(err, req, res, next) {
