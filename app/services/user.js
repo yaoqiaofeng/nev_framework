@@ -5,7 +5,7 @@ const {ModelService} = modules("serviceObject");
 const models = modules('models');
 const moment= require("moment");
 const jwt = require('jwt-simple');
-const secret = require('config').jwt.secret;
+const secret = configs.jwt.secret;
 const crypto = require('crypto');
 
 class user extends ModelService{

@@ -1,11 +1,10 @@
 /**
  * 模型基本类
  */
-const db = require("./db");
-const cache =require("./cache");
-const moment =require("moment");
 const pinyin = require('pinyin');
-const config = require('./config');
+const db = modules("db");
+const cache =modules("cache");
+const moment =require("moment");
 
 /*
 模型基本类，规定了五个方法

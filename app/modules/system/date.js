@@ -5,7 +5,7 @@ module.exports= {
         Date.prototype.Format = function(fmt){
             self.format(this, fmt);
         }
-    }
+    },
         
     format(date, fmt) { //author: meizz
         if (!fmt){
@@ -29,5 +29,5 @@ module.exports= {
             }
         }
         return fmt;
-    };
+    }
 }

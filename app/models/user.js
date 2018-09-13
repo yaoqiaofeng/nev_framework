@@ -1,4 +1,4 @@
-const {CacheModel} = models("modelObject");
+const {CacheModel} = modules("modelObject");
 class user extends CacheModel{
    static fields(){
       return ["username","password","name","tel","email","type","wx_openId","image"];

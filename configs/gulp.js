@@ -5,13 +5,13 @@ const pump = require('pump');
 
 
 gulp.task('config', function () {
-    return gulp.src([".babelrc",".esintrc","pm.js","config.js","package.json"])
+    return gulp.src([".babelrc",".esintrc","pm.json","configs/config.js","package.json"])
         .pipe(gulp.dest("dist"));
 });
 
 gulp.task("uglify", function (cb) {
     pump([
-        gulp.src(["app.js","load.js","batch.js"]),
+        gulp.src(["app.js","loader.js"]),
         babel(),
         uglify(),
         gulp.dest('./dist')

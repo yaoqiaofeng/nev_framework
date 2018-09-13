@@ -1,4 +1,4 @@
-const load = require("./loader");
+const loader = require("./loader");
 
 // 加载器
 loader.init();

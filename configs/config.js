@@ -38,8 +38,8 @@ module.exports = {
     logger: {
         appenders: {
             out: { type: 'stdout' },
-            app: { type: 'file', filename: 'application.log' },
-            error: { type: 'file', filename: 'error.log' }
+            app: { type: 'datefile', filename: './logs/app', "alwaysIncludePattern": true, "pattern": "-yyyy-MM-dd-hh.log"},
+            error: { type: 'datefile', filename: './logs/error', "alwaysIncludePattern": true, "pattern": "-yyyy-MM-dd-hh.log"}
         },
         categories: { 
             default: { appenders: [ 'out', 'app' ], level: 'info' },

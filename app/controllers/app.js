@@ -10,6 +10,7 @@ const compression = require('compression');
 const server = require('http').createServer(app);
 
 module.exports = function() {
+	//开启静态文件压缩
     app.use(compression());
 	//// parse `application/json`
 	app.use(bodyParser.json({limit: '10mb'}));

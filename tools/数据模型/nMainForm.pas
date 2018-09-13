@@ -236,7 +236,7 @@ begin
         MetaData.Free;
       end;
       js :=
-      'const {CacheModel} = require("modelObject");'+slinebreak+
+      'const {CacheModel} = modules("modelObject");'+slinebreak+
       'class '+tableName+' extends CacheModel{'+slinebreak+
       '    static fields(){'+slinebreak+
       '        return ['+fields+'];'+slinebreak+
@@ -440,7 +440,7 @@ begin
         MetaData.Free;
       end;
       js :=
-      'const {SqlModel} = require("modelObject");'+slinebreak+
+      'const {SqlModel} = modules("modelObject");'+slinebreak+
       'class '+tableName+' extends SqlModel{'+slinebreak+
       '    static name(){'+slinebreak+
       '        return "'+HTMLCheckList1.Items[i]+'";'+slinebreak+
@@ -545,7 +545,7 @@ begin
         MetaData.Free;
       end;
       js :=
-      'const {CacheModel} = require("modelObject");'+slinebreak+
+      'const {CacheModel} = modules("modelObject");'+slinebreak+
       'class '+tableName+' extends CacheModel{'+slinebreak+
       '    static fields(){'+slinebreak+
       '        return ['+fields+'];'+slinebreak+
@@ -653,7 +653,7 @@ begin
         MetaData.Free;
       end;
       js :=
-      'const {SqlModel} = require("modelObject");'+slinebreak+
+      'const {SqlModel} = modules("modelObject");'+slinebreak+
       'class '+tableName+' extends SqlModel{'+slinebreak+
       '    static name(){'+slinebreak+
       '        return "'+HTMLCheckList1.Items[i]+'";'+slinebreak+

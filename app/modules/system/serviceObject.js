@@ -1,11 +1,10 @@
 /**
  * 服务基本类
  */
-const model = require('./model');
 const pinyin = require('pinyin');
 const xlsx = require('node-xlsx');
-const db = require('./db');
-const cache = require('./cache');
+const db = modules('./db');
+const cache = modules('./cache');
 const moment = require('moment');
 
 /*
@@ -292,7 +291,7 @@ class BaseService{
         let tableRow = null;
         let rows = [];
         if (typeof table=="string"){
-            rows = await model(table).select();
+            rows = await models(table).select();
         } else {
             rows = table;
         }
@@ -337,7 +336,7 @@ class BaseService{
         if (typeof(matchFields)=="string"){
             matchFields = [matchFields];
         }
-        let Table = model(table);
+        let Table = models(table);
         let all = await Table.select();
         if (!row[name]) {
             row[name] = [];
@@ -715,7 +714,7 @@ class ModelService extends BaseService{
 
 
     static async doGet(data, env){    
-        let table = model(this.modelName());
+        let table = models(this.modelName());
         let rows = await table.select({id: data.id});
         let row = {}
         if (rows.length>0){
@@ -744,7 +743,7 @@ class ModelService extends BaseService{
     }
 
     static async doList(data, env){    
-        let table = model(this.modelName());
+        let table = models(this.modelName());
         let all = await table.select(data.filter);
         let result = [];
         for (let row of all){
@@ -765,17 +764,17 @@ class ModelService extends BaseService{
     }
 
     static async doUpdate(data, env, conn, multi){
-        let table = model(this.modelName());
+        let table = models(this.modelName());
         return await table.update(data, conn, multi);
     }
 
     static async doAdd(data, env, conn, multi){
-        let table = model(this.modelName());
+        let table = models(this.modelName());
         return await table.insert(data, conn, multi);
     }
 
     static async doDelete(data, env, conn, multi){
-        let table = model(this.modelName());
+        let table = models(this.modelName());
         let rows = await table.select({id: data.id});
         if (rows.length==1){
             await table.delete({id:data.id}, conn, multi);

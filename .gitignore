@@ -6,3 +6,5 @@ __history/
 public/
 dist/
 debug/
+logs/*
+debug/

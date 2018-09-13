@@ -14,11 +14,11 @@ let config = {
     },
 	resolve: {
 	    alias: {
-	        plugin: path.resolve(__dirname, 'app/views/plugin'),
-            lib: path.resolve(__dirname, 'app/views/lib'),
-	        js: path.resolve(__dirname, 'app/views/common/lib'),
-	        style: path.resolve(__dirname, 'app/views/common/style'),
-	        script: path.resolve(__dirname, 'app/views/common/script')
+	        plugin: path.resolve(process.cwd(), 'app/views/plugin'),
+            lib: path.resolve(process.cwd(), 'app/views/lib'),
+	        js: path.resolve(process.cwd(), 'app/views/common/lib'),
+	        style: path.resolve(process.cwd(), 'app/views/common/style'),
+	        script: path.resolve(process.cwd(), 'app/views/common/script')
 	    }
 	},
     plugins: [],
@@ -83,13 +83,30 @@ let config = {
 		    options: {
                 loaders: {
                     css: ExtractTextPlugin.extract({
-                        use: ["css-loader", "postcss-loader"],
+                        use: [
+                            "css-loader", 
+                            {
+                                loader: 'postcss-loader',
+                                options: {
+                                    config: {
+                                        path: './configs'    // 写到目录即可，文件名强制要求是postcss.config.js
+                                    }
+                                }
+                            },
+                        ],
                         fallback: "vue-style-loader"
                     }),
                     less: ExtractTextPlugin.extract({
                         use: [
                             "css-loader",
-                            "postcss-loader",
+                            {
+                                loader: 'postcss-loader',
+                                options: {
+                                    config: {
+                                        path: './configs'    // 写到目录即可，文件名强制要求是postcss.config.js
+                                    }
+                                }
+                            },
                             "less-loader"
                         ],
                         fallback: "vue-style-loader"
@@ -97,7 +114,14 @@ let config = {
                     scss: ExtractTextPlugin.extract({
                         use: [
                             "css-loader",
-                            "postcss-loader",
+                            {
+                                loader: 'postcss-loader',
+                                options: {
+                                    config: {
+                                        path: './configs'    // 写到目录即可，文件名强制要求是postcss.config.js
+                                    }
+                                }
+                            },
                             "sass-loader"
                         ],
                         fallback: "vue-style-loader"
@@ -105,7 +129,14 @@ let config = {
                     sass: ExtractTextPlugin.extract({
                         use: [
                             "css-loader",
-                            "postcss-loader",
+                            {
+                                loader: 'postcss-loader',
+                                options: {
+                                    config: {
+                                        path: './configs'    // 写到目录即可，文件名强制要求是postcss.config.js
+                                    }
+                                }
+                            },
                             "sass-loader"
                         ],
                         fallback: "vue-style-loader"

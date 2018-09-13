@@ -9,7 +9,7 @@ const cache = {
 
     init(){	
         this.clear();
-    }
+    },
 
     //返回事务
     begin(){
