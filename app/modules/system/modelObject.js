@@ -392,8 +392,8 @@ class CacheModel extends BaseModel{
                 continue;
             }
             fieldValues.push(data[fields[i]]);
-            sql = i==0? sql : sql+',';
-            sqlvalue = i==0? sqlvalue : sqlvalue+',';
+            sql = fieldValues.length==1? sql : sql+',';
+            sqlvalue = fieldValues.length==1? sqlvalue : sqlvalue+',';
             sql = sql +db.separate(fields[i]);
             sqlvalue = sqlvalue+db.param(fields[i]);
             item[fields[i]]=data[fields[i]];
