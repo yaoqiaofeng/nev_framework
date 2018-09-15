@@ -36,9 +36,9 @@ class user extends ModelService{
     static async doFilter(data, env, row) {
         switch (env.identity) {
             case 'admin':
-                return this.filterByObject(data.filter, row) && this.search(row, ['username','name','tel','email'], data.search);;
+                return this.filterByObject(data.filter, row) && this.search(row, ['username','name','tel','email'], data.search);
             default:
-                return [];
+                return false;
         }
     }
 
