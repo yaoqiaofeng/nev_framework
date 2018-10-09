@@ -3,8 +3,8 @@
  */
 const pinyin = require('pinyin');
 const xlsx = require('node-xlsx');
-const db = modules('./db');
-const cache = modules('./cache');
+const db = modules('db');
+const cache = modules('cache');
 const moment = require('moment');
 
 /*

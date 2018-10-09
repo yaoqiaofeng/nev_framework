@@ -18,6 +18,7 @@
 7. logs 日志文件输出目录
 8. tools 配套工具目录
 9. dist 编译后用于发布的内容生成目录
+10. test 单元测试存放目录
 * configs 目录
 1. config.js 配置文件
 2. gulp.js gulp的配置文件
