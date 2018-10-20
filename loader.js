@@ -122,10 +122,8 @@ module.exports = {
     init(){
         //初始化配置文件
         global.configs = configs;        
-        //初始化系统模块
-        this.loadModules('./app/modules/system/');
-        //初始化用户模块
-        this.loadModules('./app/modules/user/');
+        //初始化公用模块
+        this.loadModules('./app/modules/');
         //初始化数据模型
         this.loadModels('./app/models/');
         //初始化业务

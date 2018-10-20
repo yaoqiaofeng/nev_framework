@@ -28,13 +28,15 @@ module.exports = {
         const wsServer = http.createServer();
         const io = require('socket.io')(wsServer);
         wsServer.listen(wsPort);
-        const redis = require('socket.io-redis');
-        let redis_db = {
-            host: configs.db.redis.host,
-            port: configs.db.redis.port,
-            db: 15,
-        }        
-        io.adapter(redis(redis_db));
+        if (configs.cache && configs.cache.name=='redis'){
+            const redis = require('socket.io-redis');
+            let redis_db = {
+                host: configs.cache.host,
+                port: configs.cache.port,
+                db: 15,
+            }        
+            io.adapter(redis(redis_db));            
+        }
         //全局可用的函数
         global.emits = function(event, data){
             io.broadcast.emit(event, data);

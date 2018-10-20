@@ -1,7 +1,7 @@
 /*
  *   用户模块
  * */
-const {ModelService} = modules("serviceObject");
+const {ModelService} = require("../system/serviceObject");
 const moment= require("moment");
 const jwt = require('jwt-simple');
 const secret = configs.jwt.secret;

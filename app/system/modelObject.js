@@ -2,8 +2,8 @@
  * 模型基本类
  */
 const pinyin = require('pinyin');
-const db = modules("db");
-const cache =modules("cache");
+const db = require("./db");
+const cache =require("./cache");
 const moment =require("moment");
 
 /*
@@ -226,13 +226,13 @@ class CacheModel extends BaseModel{
     static async open(){
         if (await this.opened()){
             let all = [];
-            all = await cache.model.getall(this.name());
+            all = await cache.kgetall(this.name());
             return all;
         } else {  
             let dataset= await db.query({ 
                 sql:'select * from '+this.name()
             })
-            await cache.model.setall(this.name(), dataset);
+            await cache.ksetall(this.name(), dataset);
             await cache.set(this.name(), 'opened');
             return dataset;   
         }
@@ -242,7 +242,7 @@ class CacheModel extends BaseModel{
         let rows = [];
         //如果有索引的，并且已经打开数据的，按索提取缓存数据
         if (data && data.id && (await this.opened())){
-            let row = await cache.model.get(this.name(), data.id);
+            let row = await cache.kget(this.name(), data.id);
             rows = [row];
         } else {
             rows =  await this.open();
@@ -336,7 +336,7 @@ class CacheModel extends BaseModel{
             params: fieldValues, 
         });
         if (await this.opened()){
-            await cache.model.set(this.name(),item, multi);
+            await cache.kset(this.name(),item, multi);
         }
     }
     
@@ -348,7 +348,7 @@ class CacheModel extends BaseModel{
                 params:[data.id]
             });
             if (this.opened()){
-                cache.model.del(this.name(), data.id, multi);
+                cache.kdel(this.name(), data.id, multi);
             }
         } else {                
             let fields = [];
@@ -374,7 +374,7 @@ class CacheModel extends BaseModel{
             });       
             if (await this.opened()){
                 for(let row of rows){
-                    cache.model.del(this.name(), row.id, multi);
+                    cache.kdel(this.name(), row.id, multi);
                 }
             }
         }
@@ -406,7 +406,7 @@ class CacheModel extends BaseModel{
         });
         item.id = db.insertId(result);        
         if (await this.opened()){
-            await cache.model.set(this.name(), item, multi);
+            await cache.kset(this.name(), item, multi);
         }
         return item.id;      
     }

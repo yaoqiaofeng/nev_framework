@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const express = require("express");
-const logger = modules('logger');
+const logger = require('../system/logger');
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
@@ -21,7 +21,7 @@ module.exports = function() {
 	//启用seesion
 	app.use(session({ secret: configs.session.secret }));
 	// 记录请求日志
-	logger.express(app);
+	logger.controller('express',app);
 	//最优先的处理请求
     app.use(function (req, res, next) {
 		//响应options请求

@@ -1,4 +1,4 @@
-const {CacheModel} = modules("modelObject");
+const {CacheModel} = require("../system/modelObject");
 class user extends CacheModel{
    static fields(){
       return ["username","password","name","tel","email","type","wx_openId","image"];

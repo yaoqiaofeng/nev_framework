@@ -1,18 +1,19 @@
 module.exports = {
     db : {
-        "mysql" : {
-            "host" : "localhost",
-            "user" : "root",
-            "password" : "root",
-            "database"  : "nev",
-            "supportBigNumbers" : true,
-            "stringifyObjects" : true,
-            "dateStrings": true
-        },
-        "redis" : {
-            "host": "",
-            "port": 6379
-        }
+        "name": "mysql",
+        "host" : "localhost",
+        "user" : "root",
+        "password" : "root",
+        "database"  : "nev",
+        "supportBigNumbers" : true,
+        "stringifyObjects" : true,
+        "dateStrings": true
+    },
+
+    cache:{
+        "name": "redis",
+        "host": "",
+        "port": 6379
     },
 
     name: '易卡通',
@@ -36,14 +37,16 @@ module.exports = {
     },
 
     logger: {
+        name: "log4js",
         appenders: {
             out: { type: 'stdout' },
             app: { type: 'datefile', filename: './logs/app', "alwaysIncludePattern": true, "pattern": "-yyyy-MM-dd-hh.log"},
             error: { type: 'datefile', filename: './logs/error', "alwaysIncludePattern": true, "pattern": "-yyyy-MM-dd-hh.log"}
         },
         categories: { 
-            default: { appenders: [ 'out', 'app' ], level: 'info' },
+            default: { appenders: [ 'out', 'app' ], level: 'all' },
             error: { appenders: [ 'out', 'app', 'error'], level: 'error' }
-        }
+        },
+        replaceConsole: true
     }
 }
